@@ -2,7 +2,7 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.1.0
+Project version: 0.2.0-dev
 Phase: Project Definition & Architecture Baseline
 Status: Design phase — implementation not started
 
@@ -19,6 +19,8 @@ Completed:
 - Temporary and permanent override behaviour defined
 - Permanent mobile changes operate on the current active period only
 - V1 independence from the Heat Control System confirmed
+- Approved visual UI mockup added as `ui_mockup/index.html` baseline
+- UI interaction prototype and human-facing acceptance tests added
 
 Key decisions:
 - D-001 through D-026 are captured in DECISIONS.md

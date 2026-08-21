@@ -26,3 +26,7 @@
 - **D-024** — Permanent mobile changes affect only the active period across the selected scope.
 - **D-025** — Identical daily schedules may be displayed as dynamic Weekdays/Weekend groups; divergence displays individual days.
 - **D-026** — Grouped edits apply only to the selected schedule period and do not overwrite other periods.
+
+- **D-028** — When ZEAL is installed and configured, its Zones are the preferred top-level navigation context; ZEAL remains optional.
+- **D-029** — The approved `ui_mockup/index.html` is the baseline for visual UX work and should be evolved rather than replaced without a decision.
+- **D-030** — UI development is validated against human-facing acceptance tests before production integration implementation.

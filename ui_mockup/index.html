@@ -1,0 +1,105 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HA Visual Climate Scheduler</title>
+<style>
+body{margin:0;font:15px system-ui;background:#f4f7fb;color:#172033}header{background:#1565c0;color:#fff;padding:18px 28px;font-size:21px;font-weight:700}main{max-width:1450px;margin:22px auto;padding:0 20px}.card{background:#fff;border:1px solid #dfe5ed;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 3px 15px #00000009}.selectors{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}label{font-weight:700;font-size:13px}select,input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;margin-top:6px;box-sizing:border-box}.room{display:flex;align-items:center;gap:15px}.room h2{margin:0}.room p{margin:3px 0;color:#6b7280}.actions{margin-left:auto}.btn{padding:10px 14px;border:1px solid #cbd5e1;border-radius:8px;background:white;font-weight:700}.primary{background:#1565c0;color:white}.days{display:flex;overflow:auto;border-bottom:1px solid #ddd}.day{padding:13px 20px;border:0;background:white;font-weight:700}.active{background:#1565c0;color:white;border-radius:7px}.axis{display:flex;justify-content:space-between;margin:15px 4% 5px 8%;color:#6b7280;font-size:12px}.plot{height:280px;margin-left:8%;position:relative;border-left:1px solid #ddd;border-bottom:1px solid #ddd;background:repeating-linear-gradient(90deg,#fff 0,#fff calc(16.666% - 1px),#edf1f6 calc(16.666% - 1px),#edf1f6 16.666%)}.band{position:absolute;top:0;height:42px;display:flex;align-items:center;justify-content:center;font-weight:700;border-radius:7px}.n{background:#1768a8;color:#fff}.m{background:#f4ce55}.d{background:#a8d9a8}.e{background:#f3a13b}.now{position:absolute;top:42px;bottom:0;width:2px;background:#1565c0}.now span{position:absolute;bottom:-27px;left:-17px;background:#1565c0;color:#fff;padding:4px 7px;border-radius:5px;font-size:11px}.point{position:absolute;width:13px;height:13px;background:#1565c0;border:3px solid white;border-radius:50%;box-shadow:0 0 0 2px #1565c0}.bottom{display:grid;grid-template-columns:1fr 1fr 1.7fr;gap:14px}.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #eee}.quick{display:grid;grid-template-columns:1fr 1fr 170px;gap:18px}.preset h3{margin:0 0 6px}.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.presetbox{border:1px solid #ccd5e1;border-radius:9px;padding:14px;cursor:pointer}.presetbox:hover{border-color:#1565c0}.note{text-align:center;color:#77808e}@media(max-width:900px){.selectors,.bottom,.quick,.presets{grid-template-columns:1fr}.room{flex-wrap:wrap}.actions{margin-left:0}}
+</style></head>
+<body>
+<header>⌂ &nbsp; HA Visual Climate Scheduler <small> v0.1.0 UI MOCKUP</small></header>
+<main>
+<div class="card selectors">
+<div><label>Zone</label><select><option>Downstairs</option><option>Upstairs</option></select></div>
+<div><label>Floor (optional)</label><select><option>Ground Floor</option><option>First Floor</option></select></div>
+<div><label>Room</label><select><option>Living Room</option><option>Kitchen</option><option>Dining Room</option><option>Bedroom</option></select></div>
+</div>
+<div class="card preset">
+<h3>First-time setup — choose a starting point</h3>
+<p>Use a preset or copy an existing room. The schedule remains fully editable afterwards.</p>
+<div class="presets">
+<div class="presetbox"><b>Balanced Home</b><br><small>21° morning/evening, 20° daytime, 17° night</small></div>
+<div class="presetbox"><b>Comfort Home</b><br><small>21° morning, 21° daytime/evening, 18° night</small></div>
+<div class="presetbox"><b>Energy Saver</b><br><small>20° morning/evening, 18° daytime, 16° night</small></div>
+<div class="presetbox"><b>Copy another room</b><br><small>Choose an existing room as the starting point</small></div>
+</div></div>
+<div class="card room"><div style="font-size:38px">🛋️</div><div><h2>Living Room</h2><p>Ground Floor • Downstairs</p></div><div class="actions"><button class="btn">✎ Edit Schedule</button> <button class="btn" onclick="copyRoom()">▣ Copy Room</button> <button class="btn primary">♨ Quick Change</button></div></div>
+<div class="card">
+<div class="days"><button class="day active">Monday</button><button class="day">Tuesday</button><button class="day">Wednesday</button><button class="day">Thursday</button><button class="day">Friday</button><button class="day">Saturday</button><button class="day">Sunday</button></div>
+<div class="axis"><span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>24:00</span></div>
+<div class="plot">
+<div class="band n" style="left:0;width:12.5%">Night · 17°</div><div class="band m" style="left:12.5%;width:12.5%">Morning · 21°</div><div class="band d" style="left:25%;width:33.3%">Daytime · 20°</div><div class="band e" style="left:58.3%;width:16.7%">Evening · 21°</div><div class="band n" style="left:75%;width:25%">Night · 17°</div>
+<div class="point" style="left:27%;top:30%" title="Morning" onclick="editPeriod(periods[0])"></div><div class="point" style="left:37.5%;top:55%" title="Daytime" onclick="editPeriod(periods[1])"></div><div class="point" style="left:68.7%;top:30%" title="Evening" onclick="editPeriod(periods[2])"></div><div class="point" style="left:93%;top:78%" title="Night" onclick="editPeriod(periods[3])"></div>
+<div class="now" style="left:77%"><span>18:30</span></div></div></div>
+<div class="bottom">
+<div class="card"><h3>Today's Summary</h3><div class="row"><span>Current Period</span><b>Evening</b></div><div class="row"><span>Scheduled</span><b>21.0°C</b></div><div class="row"><span>Next Change</span><b>22:30</b></div><div class="row"><span>Current Temperature</span><b>21.3°C</b></div></div>
+<div class="card"><h3>Schedule Periods</h3><div class="row"><span>🌙 Night</span><b>22:30–06:30 · 17°</b></div><div class="row"><span>☀ Morning</span><b>06:30–09:00 · 21°</b></div><div class="row"><span>☼ Daytime</span><b>09:00–17:00 · 20°</b></div><div class="row"><span>🌅 Evening</span><b>17:00–22:30 · 21°</b></div></div>
+<div class="card"><h3>Quick Change — Active Period: Evening</h3><div class="quick"><div><b>Temporary</b><p>○ 2 hours</p><p>○ 4 hours</p><p>◉ Until next change</p></div><div><b>Permanent — Apply to</b><p>◉ Monday only</p><p>○ Weekdays</p><p>○ Weekend</p><p>○ All days</p></div><div><input value="23.0" type="number" step=".5" style="font-size:25px;font-weight:700;text-align:center"><button class="btn primary" style="width:100%;margin-top:10px">Apply</button></div></div></div>
+</div>
+<p class="note">Prototype only — scheduled values are targets; actual room temperature may differ.</p>
+</main>
+<script>
+const periods = [
+  {id:"p001", name:"Morning", time:"06:30", temp:21},
+  {id:"p002", name:"Daytime", time:"09:00", temp:20},
+  {id:"p003", name:"Evening", time:"17:00", temp:21},
+  {id:"p004", name:"Night", time:"22:30", temp:17}
+];
+let selected = periods[2];
+
+function editPeriod(p){
+  selected=p;
+  document.getElementById("editPeriodName").textContent=p.name;
+  document.getElementById("editTime").value=p.time;
+  document.getElementById("editTemp").value=p.temp;
+  document.getElementById("editPanel").style.display="block";
+  document.getElementById("editPanel").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function savePeriod(){
+  const t=document.getElementById("editTime").value;
+  const temp=parseFloat(document.getElementById("editTemp").value);
+  if(!/^\d{2}:\d{2}$/.test(t) || Number.isNaN(temp)){alert("Enter a valid time and temperature.");return;}
+  selected.time=t; selected.temp=temp;
+  document.getElementById("editPanel").style.display="none";
+  alert(selected.name+" saved: "+t+" / "+temp+"°C");
+}
+function quickApply(scope){
+  const temp=parseFloat(document.getElementById("quickTemp").value);
+  const duration=document.querySelector('input[name="duration"]:checked').value;
+  alert((duration==="permanent"?"Permanent":"Temporary")+" change to "+temp+"°C — scope: "+scope+" — active period: "+selected.name);
+}
+function copyRoom(){
+  alert("Copy Room: choose an existing room as the source, then select the destination. The copied schedule becomes independent.");
+}
+</script>
+<div id="editPanel" class="card" style="display:none;margin-top:14px">
+  <h3 style="margin-top:0">Edit <span id="editPeriodName"></span></h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div><label>Time</label><input id="editTime" type="time" step="60"></div>
+    <div><label>Setpoint °C</label><input id="editTemp" type="number" step="0.5"></div>
+  </div>
+  <div style="margin-top:14px"><button class="btn" onclick="document.getElementById('editPanel').style.display='none'">Cancel</button> <button class="btn primary" onclick="savePeriod()">Save</button></div>
+</div>
+<div class="card" style="margin-top:14px">
+  <h3 style="margin-top:0">Mobile / Quick Change — Active Period: <span id="quickPeriod">Evening</span></h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr 180px;gap:18px">
+    <div>
+      <b>Temperature</b>
+      <input id="quickTemp" value="23" type="number" step="0.5" style="font-size:25px;font-weight:700;text-align:center">
+    </div>
+    <div>
+      <b>Duration</b>
+      <label style="display:block;margin-top:10px"><input type="radio" name="duration" value="2h" checked style="width:auto"> 2 hours</label>
+      <label style="display:block;margin-top:8px"><input type="radio" name="duration" value="4h" style="width:auto"> 4 hours</label>
+      <label style="display:block;margin-top:8px"><input type="radio" name="duration" value="next" style="width:auto"> Next schedule change</label>
+      <label style="display:block;margin-top:8px"><input type="radio" name="duration" value="permanent" style="width:auto"> Permanent</label>
+    </div>
+    <div>
+      <b>Permanent scope</b>
+      <button class="btn primary" style="width:100%;margin-top:12px" onclick="quickApply('Today only')">Today only</button>
+      <button class="btn" style="width:100%;margin-top:7px" onclick="quickApply('Weekdays')">Weekdays</button>
+      <button class="btn" style="width:100%;margin-top:7px" onclick="quickApply('Weekend')">Weekend</button>
+      <button class="btn" style="width:100%;margin-top:7px" onclick="quickApply('All week')">All week</button>
+    </div>
+  </div>
+</div>
+
+</body></html>

@@ -1,15 +1,30 @@
 # Session Manifest
 
 Project: HA Visual Climate Scheduler
-Snapshot: 0.1.0
-Purpose: End-of-session project checkpoint
+Snapshot: 0.2.0-dev
 
-This snapshot contains reviewed design artefacts and Wiki starters. No production integration code is included.
+## Added
+- `docs/UI_ACCEPTANCE_TESTS.md`
+- `release_notes/RELEASE_NOTES_0.2.0-dev.md`
+- Interactive behaviour in `ui_mockup/index.html`
 
-Recommended Git commit:
-`docs: establish v0.1.0 project definition and architecture baseline`
+## Modified
+- `docs/DECISIONS.md`
+- `docs/PROJECT_MANIFEST.md`
+- `ui_mockup/index.html`
 
-Recommended Git tag:
-`v0.1.0`
+## Deleted
+None.
 
-Next session starts from this checkpoint.
+## Production code
+None yet.
+
+## Recommended Git commit
+`ui: make scheduler mockup interactive and add UX acceptance tests`
+
+## Next
+- Refine ZEAL navigation
+- First-time presets
+- Copy Room
+- Final JSON schema
+- Begin V1 integration skeleton
