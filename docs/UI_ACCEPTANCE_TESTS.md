@@ -52,3 +52,23 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Room options are filtered by selected Zone and Floor.
 - Changing Zone clears/reselects invalid downstream context.
 - Copy Room opens a source/destination workflow and makes the destination independent.
+
+## Fully interactive schedule editor
+- Clicking a point or period opens the editor.
+- Exact time such as `09:12` can be entered.
+- Exact setpoint such as `27°C` can be entered.
+- Saving immediately updates the timeline and period list.
+- Duplicate times are rejected.
+- Setpoints outside the supported prototype range are rejected.
+- Monday can be broken out as an independent daily schedule.
+- Applying a Monday change to Weekdays synchronises Monday-Friday only.
+- Saturday and Sunday remain independent from Weekdays.
+
+## Visual temperature scale and direct manipulation
+- Graph has a visible temperature scale on the left.
+- Scale adjusts to the scheduled temperature range.
+- Each schedule point displays its setpoint.
+- Clicking a point opens the precise time/setpoint editor.
+- Vertical dragging changes the setpoint visually.
+- Dragging has a non-drag numeric alternative.
+- Heating/cooling temperature ranges remain readable.

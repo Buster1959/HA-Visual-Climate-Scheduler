@@ -31,3 +31,5 @@
 - **D-029** — The approved `ui_mockup/index.html` is the baseline for visual UX work and should be evolved rather than replaced without a decision.
 - **D-030** — UI development is validated against human-facing acceptance tests before production integration implementation.
 - **D-031** — In the UI, ZEAL Zone is the preferred top-level navigation when ZEAL is installed; Floor and Room selectors cascade from the selected Zone.
+- **D-032** — The visual mockup must be a functional local UX prototype: schedule edits, time/setpoint changes, weekday breaking and weekday application must visibly update local state before production HA integration work begins.
+- **D-033** — The schedule timeline shall display a temperature scale on the left and support both precise numeric editing and direct vertical point manipulation.

@@ -1,12 +1,11 @@
 # Session Manifest
 
 Project: HA Visual Climate Scheduler
-Snapshot: 0.3.0-dev
+Snapshot: 0.5.0-dev
 
 ## Added
-- `release_notes/RELEASE_NOTES_0.3.0-dev.md`
-- ZEAL-aware navigation prototype
-- Copy Room prototype
+- `release_notes/RELEASE_NOTES_0.5.0-dev.md`
+- Temperature scale and point-manipulation prototype
 
 ## Modified
 - `ui_mockup/index.html`
@@ -20,9 +19,10 @@ None.
 None yet.
 
 ## Recommended Git commit
-`ui: add ZEAL navigation and copy room prototype`
+`ui: add temperature scale and direct setpoint editing`
 
 ## Next
-- First-time presets
-- Persistent JSON schema
-- Weekday/day-level breaking and merging
+- Functional first-time presets
+- Functional Copy Room
+- Refine grouped schedule representation
+- Heating/cooling ranges
