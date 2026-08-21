@@ -8,9 +8,9 @@ body{margin:0;font:15px system-ui;background:#f4f7fb;color:#172033}header{backgr
 <header>⌂ &nbsp; HA Visual Climate Scheduler <small> v0.1.0 UI MOCKUP</small></header>
 <main>
 <div class="card selectors">
-<div><label>Zone</label><select><option>Downstairs</option><option>Upstairs</option></select></div>
-<div><label>Floor (optional)</label><select><option>Ground Floor</option><option>First Floor</option></select></div>
-<div><label>Room</label><select><option>Living Room</option><option>Kitchen</option><option>Dining Room</option><option>Bedroom</option></select></div>
+<div><label>Zone</label><select id="zoneSelect" onchange="navChanged()"><option value="downstairs">Downstairs</option><option value="upstairs">Upstairs</option></select></div>
+<div><label>Floor <span style="font-weight:400;color:#8a93a2">(ZEAL-aware)</span></label><select id="floorSelect" onchange="navChanged()"></select></div>
+<div><label>Room</label><select id="roomSelect" onchange="roomChanged()"></select></div>
 </div>
 <div class="card preset">
 <h3>First-time setup — choose a starting point</h3>
@@ -34,6 +34,24 @@ body{margin:0;font:15px system-ui;background:#f4f7fb;color:#172033}header{backgr
 <div class="card"><h3>Schedule Periods</h3><div class="row"><span>🌙 Night</span><b>22:30–06:30 · 17°</b></div><div class="row"><span>☀ Morning</span><b>06:30–09:00 · 21°</b></div><div class="row"><span>☼ Daytime</span><b>09:00–17:00 · 20°</b></div><div class="row"><span>🌅 Evening</span><b>17:00–22:30 · 21°</b></div></div>
 <div class="card"><h3>Quick Change — Active Period: Evening</h3><div class="quick"><div><b>Temporary</b><p>○ 2 hours</p><p>○ 4 hours</p><p>◉ Until next change</p></div><div><b>Permanent — Apply to</b><p>◉ Monday only</p><p>○ Weekdays</p><p>○ Weekend</p><p>○ All days</p></div><div><input value="23.0" type="number" step=".5" style="font-size:25px;font-weight:700;text-align:center"><button class="btn primary" style="width:100%;margin-top:10px">Apply</button></div></div></div>
 </div>
+
+<div id="copyPanel" class="card" style="display:none;margin-top:14px">
+<h3 style="margin-top:0">Copy room schedule</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+<div><label>From</label><select><option>Living Room</option><option>Kitchen</option><option>Bedroom</option></select></div>
+<div><label>To</label><select><option>Dining Room</option><option>Kitchen</option><option>Bedroom</option></select></div>
+</div>
+<div style="margin-top:14px">
+<label><input type="checkbox" checked style="width:auto"> Schedule</label>
+<label style="margin-left:20px"><input type="checkbox" checked style="width:auto"> Period names</label>
+<label style="margin-left:20px"><input type="checkbox" style="width:auto"> Temporary override</label>
+</div>
+<div style="margin-top:14px"><button class="btn" onclick="document.getElementById('copyPanel').style.display='none'">Cancel</button> <button class="btn primary" onclick="alert('Schedule copied — destination is now independent.');document.getElementById('copyPanel').style.display='none'">Copy Schedule</button></div>
+</div>
+<script>
+function openCopy(){document.getElementById("copyPanel").style.display="block";document.getElementById("copyPanel").scrollIntoView({behavior:"smooth"});}
+</script>
+
 <p class="note">Prototype only — scheduled values are targets; actual room temperature may differ.</p>
 </main>
 <script>
@@ -101,5 +119,50 @@ function copyRoom(){
     </div>
   </div>
 </div>
+
+
+<script>
+const zealHierarchy = {
+  downstairs: {
+    "Ground Floor": ["Living Room","Kitchen","Dining Room"],
+    "First Floor": ["Office"]
+  },
+  upstairs: {
+    "First Floor": ["Bedroom","Bathroom"]
+  }
+};
+
+function navChanged(){
+  const zone=document.getElementById("zoneSelect").value;
+  const floor=document.getElementById("floorSelect");
+  const room=document.getElementById("roomSelect");
+  const floors=Object.keys(zealHierarchy[zone]);
+  const oldFloor=floor.value;
+  floor.innerHTML="";
+  floors.forEach(f=>floor.add(new Option(f,f)));
+  floor.value=floors.includes(oldFloor)?oldFloor:floors[0];
+  updateRooms();
+}
+function updateRooms(){
+  const zone=document.getElementById("zoneSelect").value;
+  const floor=document.getElementById("floorSelect").value;
+  const room=document.getElementById("roomSelect");
+  const old=room.value;
+  room.innerHTML="";
+  (zealHierarchy[zone][floor]||[]).forEach(r=>room.add(new Option(r,r)));
+  if ([...room.options].some(o=>o.value===old)) room.value=old;
+  roomChanged();
+}
+function roomChanged(){
+  const room=document.getElementById("roomSelect").value;
+  const title=document.querySelector(".room h2");
+  if(title) title.textContent=room;
+  const subtitle=document.querySelector(".room p");
+  const zone=document.getElementById("zoneSelect").value;
+  const floor=document.getElementById("floorSelect").value;
+  if(subtitle) subtitle.textContent=floor+" • "+(zone==="downstairs"?"Downstairs":"Upstairs")+" • ZEAL Zone";
+}
+navChanged();
+</script>
 
 </body></html>

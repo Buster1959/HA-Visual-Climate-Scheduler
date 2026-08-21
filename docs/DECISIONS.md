@@ -30,3 +30,4 @@
 - **D-028** — When ZEAL is installed and configured, its Zones are the preferred top-level navigation context; ZEAL remains optional.
 - **D-029** — The approved `ui_mockup/index.html` is the baseline for visual UX work and should be evolved rather than replaced without a decision.
 - **D-030** — UI development is validated against human-facing acceptance tests before production integration implementation.
+- **D-031** — In the UI, ZEAL Zone is the preferred top-level navigation when ZEAL is installed; Floor and Room selectors cascade from the selected Zone.

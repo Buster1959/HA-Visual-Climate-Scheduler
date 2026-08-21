@@ -1,17 +1,17 @@
 # Session Manifest
 
 Project: HA Visual Climate Scheduler
-Snapshot: 0.2.0-dev
+Snapshot: 0.3.0-dev
 
 ## Added
-- `docs/UI_ACCEPTANCE_TESTS.md`
-- `release_notes/RELEASE_NOTES_0.2.0-dev.md`
-- Interactive behaviour in `ui_mockup/index.html`
+- `release_notes/RELEASE_NOTES_0.3.0-dev.md`
+- ZEAL-aware navigation prototype
+- Copy Room prototype
 
 ## Modified
-- `docs/DECISIONS.md`
-- `docs/PROJECT_MANIFEST.md`
 - `ui_mockup/index.html`
+- `docs/UI_ACCEPTANCE_TESTS.md`
+- `docs/DECISIONS.md`
 
 ## Deleted
 None.
@@ -20,11 +20,9 @@ None.
 None yet.
 
 ## Recommended Git commit
-`ui: make scheduler mockup interactive and add UX acceptance tests`
+`ui: add ZEAL navigation and copy room prototype`
 
 ## Next
-- Refine ZEAL navigation
 - First-time presets
-- Copy Room
-- Final JSON schema
-- Begin V1 integration skeleton
+- Persistent JSON schema
+- Weekday/day-level breaking and merging

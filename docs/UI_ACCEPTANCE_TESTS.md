@@ -45,3 +45,10 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Copy schedule.
 - Confirm destination becomes independent.
 - Temporary overrides and future learning history are not copied by default.
+
+## ZEAL navigation prototype
+- Zone is the preferred top-level selector when ZEAL is present.
+- Floor options are filtered by selected Zone.
+- Room options are filtered by selected Zone and Floor.
+- Changing Zone clears/reselects invalid downstream context.
+- Copy Room opens a source/destination workflow and makes the destination independent.
