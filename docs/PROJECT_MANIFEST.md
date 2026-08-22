@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.13.0-dev
-Phase: Block 9 — Quick Change & Temporary Overrides
-Status: Separate Quick Change view applies cancellable temporary holds without modifying schedules
+Project version: 0.14.0-dev
+Phase: Block 10 — Copy Schedule to Rooms
+Status: Existing schedule editor copies its current seven-day schedule to selected rooms without changing their thermostat assignments
 
 ## Session checkpoint
 
@@ -42,14 +42,16 @@ Completed:
 - A local integration brand icon is bundled for current Home Assistant releases
 - Block 8 override scenarios and future Away/Calendar/Alarmo direction are documented without implementation
 - Each day card has a temperature timeline with direct time/target point dragging and a visible scale
+- Quick Change applies cancellable temporary holds without modifying saved schedules
+- A completed schedule can be copied to selected rooms/zones; only their daily schedules are replaced
 
 Key decisions:
-- D-001 through D-051 are captured in DECISIONS.md
+- D-001 through D-052 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 
 Next session:
-- Add temporary overrides as a separate layer over the deterministic engine
+- V1 release readiness: live HA acceptance testing, HACS packaging and matching Wiki release instructions
 
 ## Repository workflow
 

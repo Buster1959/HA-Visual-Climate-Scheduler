@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant, callback
 
 from .configuration import async_save_configuration
 from .const import DOMAIN
-from .editor import update_room_days
+from .editor import copy_room_schedule, update_room_days
 
 _REGISTERED = f"{DOMAIN}_websocket_registered"
 
@@ -22,6 +22,7 @@ def async_register_commands(hass: HomeAssistant) -> None:
         return
     websocket_api.async_register_command(hass, ws_get_configuration)
     websocket_api.async_register_command(hass, ws_update_room_days)
+    websocket_api.async_register_command(hass, ws_copy_room_schedule)
     websocket_api.async_register_command(hass, ws_get_quick_change)
     websocket_api.async_register_command(hass, ws_set_temporary_override)
     websocket_api.async_register_command(hass, ws_clear_temporary_override)
@@ -67,6 +68,41 @@ async def ws_update_room_days(
     try:
         updated_configuration = update_room_days(
             entry_data["configuration"], msg["room_id"], msg["days"]
+        )
+    except KeyError:
+        connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "Unknown room or zone")
+        return
+    except ValueError as err:
+        connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, str(err))
+        return
+    await async_save_configuration(hass, entry_id, updated_configuration)
+    connection.send_result(msg["id"], updated_configuration.to_dict())
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "visual_climate_scheduler/copy_room_schedule",
+        vol.Required("source_room_id"): str,
+        vol.Required("target_room_ids"): [str],
+        vol.Required("source_days"): dict,
+    }
+)
+@websocket_api.async_response
+async def ws_copy_room_schedule(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Copy the current source editor state to selected destination spaces."""
+    if (entry := _entry_data(hass)) is None:
+        connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "Scheduler is not loaded")
+        return
+    entry_id, entry_data = entry
+    try:
+        updated_configuration = copy_room_schedule(
+            entry_data["configuration"],
+            msg["source_room_id"],
+            msg["target_room_ids"],
+            msg["source_days"],
         )
     except KeyError:
         connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "Unknown room or zone")

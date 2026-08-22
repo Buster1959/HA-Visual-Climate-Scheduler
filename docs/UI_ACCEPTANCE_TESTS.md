@@ -40,11 +40,12 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Permanent changes alter the selected daily/grouped schedule period.
 
 ## Copy room
-- Select source room.
-- Select destination room.
-- Copy schedule.
-- Confirm destination becomes independent.
-- Temporary overrides and future learning history are not copied by default.
+- Select a source room with current unsaved schedule edits.
+- Expand **Copy schedule to rooms** and select one or more destination rooms.
+- Copy the schedule and confirm the source edits and all seven days are saved.
+- Confirm destination schedules match but are independent afterwards.
+- Confirm destination name, Area and thermostat assignments are unchanged.
+- Confirm temporary overrides and future learning history are not copied.
 
 ## ZEAL navigation prototype
 - Zone is the preferred top-level selector when ZEAL is present.

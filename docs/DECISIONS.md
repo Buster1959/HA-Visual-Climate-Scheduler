@@ -51,3 +51,4 @@
 - **D-049** — Manual temporary overrides are per scheduled space. Selected-room and whole-house actions expand into independent room/zone overrides; they do not create new schedule scopes or types.
 - **D-050** — Future Away and Calendar periods are policy/mode layers above the independent daily schedules. They must remain optional and use a generic Home Assistant automation boundary rather than creating an Alarmo dependency.
 - **D-051** — The visual editor is a direct-manipulation convenience over the same seven daily lists. Dragging uses intentional 15-minute and 0.5°C steps; exact typed fields remain the authoritative fine-control path.
+- **D-052** — Copying a schedule to another room/zone replaces only its seven daily period lists. The destination's name, Area and thermostat assignments are never copied.

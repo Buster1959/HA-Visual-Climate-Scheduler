@@ -1,6 +1,6 @@
-# Instructions for Use — Pre-release 0.12.0-dev
+# Instructions for Use — Pre-release 0.14.0-dev
 
-This guide describes the implemented Block 8 pre-release. It is suitable for
+This guide describes the implemented Block 10 pre-release. It is suitable for
 people happy to test an unfinished integration in a non-critical room or zone.
 
 ## Before you begin
@@ -9,8 +9,8 @@ people happy to test an unfinished integration in a non-critical room or zone.
 - Test with one room or zone first. A saved schedule is live: the scheduler
   applies setpoints at schedule transitions and reconciles the current target
   when the integration starts.
-- This build is admin-only. It does not yet provide temporary overrides,
-  mobile quick controls or timeline dragging.
+- This build is admin-only. It includes timeline editing and temporary holds;
+  use it first in a non-critical room or zone.
 
 ## Install and add the integration
 
@@ -55,14 +55,27 @@ Go to **Settings → Devices & services → Visual Climate Scheduler → Configu
 5. To reuse a day: choose its **Source** radio button, tick **Apply here** on
    one or more destination days, choose **Apply to selected days**, then Save.
    The copied days are independent afterwards.
+6. To copy a complete seven-day schedule to another room or zone, select the
+   finished source room, expand **Copy schedule to rooms**, tick the destination
+   rooms and choose **Copy to selected rooms**. This also saves any current
+   source edits. It replaces only each destination's daily schedule; its name,
+   Area and selected thermostats are unchanged.
+
+## Quick Change
+
+Choose **Quick Change** in the editor to make a temporary adjustment without
+altering any saved weekly schedule. Select one or more rooms/zones (or
+**Whole house**), use `−1` / `+1` or enter an exact target, then select two
+hours, four hours or until that room's next scheduled change. Active holds can
+be cancelled individually. Temporary holds are runtime state and clear if Home
+Assistant restarts.
 
 ## Current limits and safe testing
 
 - The storage model can retain more than four periods per day, but this first
   editor presents up to four.
 - Duplicate times within a day are rejected. Periods are saved in time order.
-- There are no temporary overrides yet. Do not use this build where an
-  automatic setpoint change would be unsafe or disruptive.
+- A temporary hold is not restored after a Home Assistant restart.
 - If the sidebar does not appear, confirm you are an administrator, the
   checkbox is enabled and refresh the Home Assistant browser page after
   changing it.
@@ -70,5 +83,5 @@ Go to **Settings → Devices & services → Visual Climate Scheduler → Configu
 ## Reporting feedback
 
 When reporting a problem, include your Home Assistant version, the integration
-version (`0.12.0-dev`), the affected room/zone and the exact steps that led to
+version (`0.14.0-dev`), the affected room/zone and the exact steps that led to
 the result. Do not include secrets or full Home Assistant backups.
