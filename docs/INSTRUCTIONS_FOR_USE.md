@@ -1,6 +1,6 @@
-# Instructions for Use — Pre-release 0.14.0-dev
+# Instructions for Use — Pre-release 0.15.0-dev
 
-This guide describes the implemented Block 10 pre-release. It is suitable for
+This guide describes the implemented Block 11 pre-release. It is suitable for
 people happy to test an unfinished integration in a non-critical room or zone.
 
 ## Before you begin
@@ -39,6 +39,16 @@ Go to **Settings → Devices & services → Visual Climate Scheduler → Configu
 - A climate thermostat can belong to only one scheduled space. This prevents
   two schedules from competing for the same device.
 - **Remove a room or zone** removes that saved space and its schedule.
+
+## Temperature unit
+
+When the integration first opens, it stores Home Assistant's configured
+temperature unit (`°C` or `°F`) as the reference for every schedule. Do not
+change Home Assistant from Celsius to Fahrenheit, or Fahrenheit to Celsius,
+and continue using the same integration: remove and re-add **Visual Climate
+Scheduler** instead, then create schedules in the new unit. This is deliberate
+safety behaviour; it prevents an old value being sent as though it used the new
+unit.
 
 ## Enable and use the sidebar editor
 
@@ -83,5 +93,5 @@ Assistant restarts.
 ## Reporting feedback
 
 When reporting a problem, include your Home Assistant version, the integration
-version (`0.14.0-dev`), the affected room/zone and the exact steps that led to
+version (`0.15.0-dev`), the affected room/zone and the exact steps that led to
 the result. Do not include secrets or full Home Assistant backups.

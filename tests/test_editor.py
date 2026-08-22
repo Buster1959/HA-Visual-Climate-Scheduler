@@ -37,7 +37,7 @@ class EditorUpdateTests(unittest.TestCase):
 
     def test_update_revalidates_and_retains_all_other_configuration(self) -> None:
         original = ScheduleConfiguration(
-            rooms={"lounge": _room()}, settings={"show_panel": True, "units": "C"}
+            rooms={"lounge": _room()}, settings={"show_panel": True, "units": "C"}, temperature_unit="°C"
         )
         days = {day: [] for day in WEEKDAYS}
         days["monday"] = [
@@ -53,6 +53,7 @@ class EditorUpdateTests(unittest.TestCase):
         updated = update_room_days(original, "lounge", days)
 
         self.assertEqual(updated.settings, {"show_panel": True, "units": "C"})
+        self.assertEqual(updated.temperature_unit, "°C")
         self.assertEqual(
             updated.rooms["lounge"].climate_entity_ids,
             ("climate.lounge_one", "climate.lounge_two"),
@@ -97,7 +98,9 @@ class EditorUpdateTests(unittest.TestCase):
             climate_entity_ids=("climate.bathroom_two",),
             days=_days(17),
         )
-        original = ScheduleConfiguration(rooms={source.id: source, destination.id: destination})
+        original = ScheduleConfiguration(
+            rooms={source.id: source, destination.id: destination}, temperature_unit="°F"
+        )
         editor_days = {day: [period.to_dict() for period in periods] for day, periods in _days(21).items()}
 
         updated = copy_room_schedule(original, source.id, [destination.id], editor_days)
@@ -108,6 +111,7 @@ class EditorUpdateTests(unittest.TestCase):
         self.assertEqual(updated.rooms[destination.id].days["monday"][0].id, "wake")
         self.assertEqual(updated.rooms[destination.id].name, "Bathroom 2")
         self.assertEqual(updated.rooms[destination.id].climate_entity_ids, ("climate.bathroom_two",))
+        self.assertEqual(updated.temperature_unit, "°F")
 
     def test_copy_rejects_an_empty_or_self_destination(self) -> None:
         original = ScheduleConfiguration(rooms={"lounge": _room()})

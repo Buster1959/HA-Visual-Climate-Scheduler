@@ -73,3 +73,11 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Vertical dragging changes the setpoint visually.
 - Dragging has a non-drag numeric alternative.
 - Heating/cooling temperature ranges remain readable.
+
+## Temperature-unit safety
+
+- Create the integration while Home Assistant uses Celsius and confirm the
+  stored schedule reference is `°C`.
+- Change Home Assistant to Fahrenheit and restart it.
+- Confirm the scheduler does not start or apply targets and instructs the user
+  to remove and re-add the integration.

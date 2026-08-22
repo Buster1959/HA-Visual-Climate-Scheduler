@@ -14,7 +14,7 @@ from .zeal import async_discover_zeal_rooms
 SERVICE_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_ENTITY_ID): vol.All(str, vol.Match(r"^climate\.")),
-        vol.Required(ATTR_TEMPERATURE): vol.All(vol.Coerce(float), vol.Range(min=5, max=35)),
+        vol.Required(ATTR_TEMPERATURE): vol.Coerce(float),
     }
 )
 

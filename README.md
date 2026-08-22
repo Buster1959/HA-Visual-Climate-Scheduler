@@ -11,9 +11,9 @@ sidebar editor and the current limitations for this checkpoint.
 The integration includes its own Home Assistant brand icon for current Home
 Assistant releases.
 
-## Checkpoint 0.14.0-dev
+## Checkpoint 0.15.0-dev
 
-**Block 10 — Copy Schedule to Rooms**
+**Block 11 — V1 Temperature-Unit Safety**
 
 The scheduler now has an optional, admin-only sidebar editor. In the
 integration's Configure menu, choose **Sidebar editor** and tick **Show
@@ -41,6 +41,12 @@ When one room's schedule is right, expand **Copy schedule to rooms** on the
 Schedule page, select the destination rooms/zones and copy it. This saves the
 current source schedule and replaces only each selected destination's seven-day
 schedule; its name, Area and assigned thermostats remain untouched.
+
+At initial setup the integration records Home Assistant's configured
+temperature unit (`°C` or `°F`) as the reference for all stored schedules. If
+you later change Home Assistant between Celsius and Fahrenheit, remove and
+re-add this integration before scheduling again; this avoids silently applying
+saved values in the wrong unit.
 
 ## V1
 - Visual PC/tablet timeline editor

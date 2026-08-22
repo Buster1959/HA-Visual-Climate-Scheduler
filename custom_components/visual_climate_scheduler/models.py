@@ -13,7 +13,7 @@ import math
 import re
 from typing import Any, Iterable, Mapping
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 WEEKDAYS = (
     "monday",
     "tuesday",
@@ -23,6 +23,7 @@ WEEKDAYS = (
     "saturday",
     "sunday",
 )
+TEMPERATURE_UNITS = ("°C", "°F")
 
 _TIME_PATTERN = re.compile(r"^(?:[01][0-9]|2[0-3]):[0-5][0-9]$")
 
@@ -39,6 +40,13 @@ def validate_time(value: Any) -> str:
     value = _require_string(value, "time")
     if not _TIME_PATTERN.fullmatch(value):
         raise ValueError("time must use an exact 24-hour HH:MM format")
+    return value
+
+
+def validate_temperature_unit(value: Any) -> str:
+    """Validate the fixed Home Assistant temperature reference unit."""
+    if value not in TEMPERATURE_UNITS:
+        raise ValueError("temperature_unit must be °C or °F")
     return value
 
 
@@ -221,6 +229,7 @@ class ScheduleConfiguration:
     version: int = SCHEMA_VERSION
     rooms: Mapping[str, RoomSchedule] = field(default_factory=dict)
     settings: Mapping[str, Any] = field(default_factory=dict)
+    temperature_unit: str | None = None
 
     def __post_init__(self) -> None:
         if isinstance(self.version, bool) or self.version != SCHEMA_VERSION:
@@ -232,11 +241,21 @@ class ScheduleConfiguration:
             raise ValueError("configuration room keys must match room.id")
         object.__setattr__(self, "rooms", normalized_rooms)
         object.__setattr__(self, "settings", _json_object_copy(self.settings, "configuration.settings"))
+        if self.temperature_unit is not None:
+            object.__setattr__(self, "temperature_unit", validate_temperature_unit(self.temperature_unit))
 
     @classmethod
     def empty(cls) -> "ScheduleConfiguration":
         """Return a valid empty configuration for a new config entry."""
         return cls()
+
+    def with_temperature_unit(self, temperature_unit: str) -> "ScheduleConfiguration":
+        """Bind this schedule document to Home Assistant's current unit."""
+        return ScheduleConfiguration(
+            rooms=self.rooms,
+            settings=self.settings,
+            temperature_unit=validate_temperature_unit(temperature_unit),
+        )
 
     @staticmethod
     def migrate_dict(value: Mapping[str, Any]) -> dict[str, Any]:
@@ -245,7 +264,8 @@ class ScheduleConfiguration:
         Version 0 was the pre-versioned prototype shape. Version 1 used a single
         ``climate_entity_id`` per scheduled space. Version 2 stores a non-empty
         ``climate_entity_ids`` list, allowing a room or zone to set several
-        thermostats without adding a second schedule type.
+        thermostats without adding a second schedule type. Version 3 records the
+        temperature unit used when the integration was first set up.
         """
         if not isinstance(value, Mapping):
             raise ValueError("schedule configuration must be an object")
@@ -271,6 +291,11 @@ class ScheduleConfiguration:
                 version = 2
                 migrated["version"] = version
                 continue
+            if version == 2:
+                migrated["temperature_unit"] = None
+                version = 3
+                migrated["version"] = version
+                continue
             raise ValueError(f"unsupported schedule configuration version: {version}")
         if version != SCHEMA_VERSION:
             raise ValueError(f"unsupported schedule configuration version: {version}")
@@ -289,6 +314,7 @@ class ScheduleConfiguration:
             version=value["version"],
             rooms={room_id: RoomSchedule.from_dict(room) for room_id, room in raw_rooms.items()},
             settings=raw_settings,
+            temperature_unit=value.get("temperature_unit"),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -297,4 +323,5 @@ class ScheduleConfiguration:
             "version": self.version,
             "rooms": {room_id: room.to_dict() for room_id, room in self.rooms.items()},
             "settings": _json_object_copy(self.settings, "configuration.settings"),
+            "temperature_unit": self.temperature_unit,
         }

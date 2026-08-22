@@ -25,6 +25,7 @@ def update_room_days(
     return ScheduleConfiguration(
         rooms={**configuration.rooms, updated_room.id: updated_room},
         settings=configuration.settings,
+        temperature_unit=configuration.temperature_unit,
     )
 
 
@@ -61,4 +62,8 @@ def copy_room_schedule(
             climate_entity_ids=target.climate_entity_ids,
             days={day: copy_periods(source.days[day]) for day in source.days},
         )
-    return ScheduleConfiguration(rooms=rooms, settings=updated.settings)
+    return ScheduleConfiguration(
+        rooms=rooms,
+        settings=updated.settings,
+        temperature_unit=updated.temperature_unit,
+    )

@@ -15,6 +15,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Visual Climate Scheduler from a config entry."""
     # Keep the schedule model importable for isolated validation and migrations.
     from .runtime import ScheduleRuntime
+    from homeassistant.exceptions import ConfigEntryError
     from .services import async_register_services
     from .storage import ScheduleStorage
     from .panel import async_sync_panel
@@ -23,6 +24,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     storage = ScheduleStorage(hass, entry.entry_id)
     configuration = await storage.async_load()
+    temperature_unit = str(hass.config.units.temperature_unit)
+    if configuration.temperature_unit is None:
+        configuration = configuration.with_temperature_unit(temperature_unit)
+        await storage.async_save(configuration)
+    elif configuration.temperature_unit != temperature_unit:
+        raise ConfigEntryError(
+            "Home Assistant's temperature unit changed from "
+            f"{configuration.temperature_unit} to {temperature_unit}. Remove and re-add "
+            "Visual Climate Scheduler to create schedules in the new unit."
+        )
     runtime = ScheduleRuntime(hass)
     await runtime.async_start(configuration)
 

@@ -13,11 +13,8 @@ set_zeal_room_temperature:
           domain: climate
     temperature:
       name: Target temperature
-      description: Requested temperature in degrees Celsius.
+      description: Requested temperature in the integration's Home Assistant reference unit.
       required: true
       selector:
         number:
-          min: 5
-          max: 35
           step: 0.1
-          unit_of_measurement: "°C"

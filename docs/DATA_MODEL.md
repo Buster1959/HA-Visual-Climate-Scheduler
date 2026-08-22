@@ -6,7 +6,8 @@ Each config entry owns one JSON document through Home Assistant's Store helper:
 
 ```json
 {
-  "version": 2,
+  "version": 3,
+  "temperature_unit": "°C",
   "rooms": {
     "living_room": {
       "id": "living_room",
@@ -43,6 +44,8 @@ Each config entry owns one JSON document through Home Assistant's Store helper:
 ```
 
 - All seven days are independently stored. Weekdays, Weekend and All Days remain UI grouping/apply actions, never stored schedule groups.
+- `temperature_unit` is the Home Assistant unit (`°C` or `°F`) at initial
+  integration setup. It is a fixed reference for every stored target.
 - `id` is the stable identity used by future copy/apply and editing operations. `friendly_name` is a readable stable label; `name` is the user-facing display name.
 - `time` is an exact, zero-padded 24-hour `HH:MM` string. Daily periods must already be chronologically ordered; the model rejects duplicate IDs, duplicate times and unordered lists.
 - The initial editor may expose four periods per day, but the persisted list has no four-period cap.
@@ -55,11 +58,14 @@ Each config entry owns one JSON document through Home Assistant's Store helper:
 
 ## Versioning and migration
 
-`version` is the document schema version, currently `2`; it is separate from
+`version` is the document schema version, currently `3`; it is separate from
 Home Assistant Store's storage wrapper version. The model migrates the
 pre-versioned prototype shape (implicit version `0`) through version 1. Version
 1's singular `climate_entity_id` is migrated to a one-item
-`climate_entity_ids` list. Unknown future versions are rejected rather than
-guessed.
+`climate_entity_ids` list. Version 3 records the temperature reference unit;
+older schedules are bound to Home Assistant's current unit the next time the
+integration opens. If the Home Assistant unit subsequently changes, users must
+remove and re-add the integration rather than risk silently misinterpreting
+saved values. Unknown future versions are rejected rather than guessed.
 All persisted output is a detached JSON-compatible object, suitable for Home
 Assistant Store.

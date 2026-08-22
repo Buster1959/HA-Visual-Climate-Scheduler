@@ -52,6 +52,7 @@ def add_scheduled_space(
     return ScheduleConfiguration(
         rooms={**configuration.rooms, room.id: room},
         settings=configuration.settings,
+        temperature_unit=configuration.temperature_unit,
     )
 
 
@@ -63,7 +64,11 @@ def remove_scheduled_space(
         raise ValueError(f"unknown scheduled space: {room_id}")
     rooms = dict(configuration.rooms)
     rooms.pop(room_id)
-    return ScheduleConfiguration(rooms=rooms, settings=configuration.settings)
+    return ScheduleConfiguration(
+        rooms=rooms,
+        settings=configuration.settings,
+        temperature_unit=configuration.temperature_unit,
+    )
 
 
 def update_scheduled_space(
@@ -100,5 +105,7 @@ def update_scheduled_space(
         days=existing_room.days,
     )
     return ScheduleConfiguration(
-        rooms={**configuration.rooms, room_id: updated_room}, settings=configuration.settings
+        rooms={**configuration.rooms, room_id: updated_room},
+        settings=configuration.settings,
+        temperature_unit=configuration.temperature_unit,
     )

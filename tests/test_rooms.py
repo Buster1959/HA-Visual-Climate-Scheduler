@@ -43,13 +43,14 @@ class ScheduledSpaceTests(unittest.TestCase):
 
     def test_removal_leaves_other_spaces_unchanged(self) -> None:
         configuration = add_scheduled_space(
-            ScheduleConfiguration.empty(), name="Lounge", climate_entity_ids=("climate.lounge",)
+            ScheduleConfiguration.empty().with_temperature_unit("°C"), name="Lounge", climate_entity_ids=("climate.lounge",)
         )
         configuration = add_scheduled_space(
             configuration, name="Bedroom", climate_entity_ids=("climate.bedroom",)
         )
         remaining = remove_scheduled_space(configuration, "lounge")
         self.assertEqual(tuple(remaining.rooms), ("bedroom",))
+        self.assertEqual(remaining.temperature_unit, "°C")
 
     def test_modifying_space_adds_thermostat_without_losing_schedule(self) -> None:
         initial = add_scheduled_space(

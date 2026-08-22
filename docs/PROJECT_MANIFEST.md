@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.14.0-dev
-Phase: Block 10 — Copy Schedule to Rooms
-Status: Existing schedule editor copies its current seven-day schedule to selected rooms without changing their thermostat assignments
+Project version: 0.15.0-dev
+Phase: Block 11 — V1 Temperature-Unit Safety
+Status: Schedule document records Home Assistant's initial temperature unit and safely blocks a changed unit until the integration is reset
 
 ## Session checkpoint
 
@@ -44,14 +44,15 @@ Completed:
 - Each day card has a temperature timeline with direct time/target point dragging and a visible scale
 - Quick Change applies cancellable temporary holds without modifying saved schedules
 - A completed schedule can be copied to selected rooms/zones; only their daily schedules are replaced
+- Schedule storage records `°C` or `°F` at initial setup and rejects a changed HA unit rather than silently applying misleading targets
 
 Key decisions:
-- D-001 through D-052 are captured in DECISIONS.md
+- D-001 through D-053 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 
 Next session:
-- V1 release readiness: live HA acceptance testing, HACS packaging and matching Wiki release instructions
+- V1 release readiness: live HA acceptance testing, HACS packaging and a release candidate
 
 ## Repository workflow
 

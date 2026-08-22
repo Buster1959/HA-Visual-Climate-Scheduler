@@ -55,6 +55,16 @@ class ScheduleModelTests(unittest.TestCase):
 
         self.assertTrue(restored.settings["show_panel"])
 
+    def test_temperature_reference_unit_is_persisted_and_validated(self) -> None:
+        original = ScheduleConfiguration.empty().with_temperature_unit("°C")
+
+        restored = ScheduleConfiguration.from_dict(original.to_dict())
+
+        self.assertEqual(restored.temperature_unit, "°C")
+        self.assertEqual(restored.to_dict()["temperature_unit"], "°C")
+        with self.assertRaisesRegex(ValueError, "°C or °F"):
+            ScheduleConfiguration(temperature_unit="kelvin")
+
     def test_seven_days_are_required_and_independent(self) -> None:
         with self.assertRaisesRegex(ValueError, "exactly monday through sunday"):
             room({"monday": ()})
@@ -117,8 +127,9 @@ class ScheduleModelTests(unittest.TestCase):
             }
         )
         self.assertEqual(legacy.rooms["living_room"].climate_entity_ids, ("climate.living_room",))
+        self.assertIsNone(legacy.temperature_unit)
         with self.assertRaisesRegex(ValueError, "unsupported"):
-            ScheduleConfiguration.from_dict({"version": 3, "rooms": {}, "settings": {}})
+            ScheduleConfiguration.from_dict({"version": SCHEMA_VERSION + 1, "rooms": {}, "settings": {}})
 
     def test_room_can_target_multiple_thermostats(self) -> None:
         lounge = RoomSchedule(
