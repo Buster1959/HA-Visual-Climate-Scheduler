@@ -48,3 +48,5 @@
 - **D-046** — Day application is explicit: one source day and checked destination days. It copies detached day lists locally; the normal Save action validates and persists the result.
 - **D-047** — Each pre-release publishes matching Instructions for Use in the GitHub Wiki and keeps a versioned source copy in the repository. The README links users to the current Wiki guide.
 - **D-048** — The custom integration bundles its own transparent brand icon, rather than relying on a Home Assistant core branding asset.
+- **D-049** — Manual temporary overrides are per scheduled space. Selected-room and whole-house actions expand into independent room/zone overrides; they do not create new schedule scopes or types.
+- **D-050** — Future Away and Calendar periods are policy/mode layers above the independent daily schedules. They must remain optional and use a generic Home Assistant automation boundary rather than creating an Alarmo dependency.

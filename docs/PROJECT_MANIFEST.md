@@ -40,9 +40,10 @@ Completed:
 - Sidebar day application uses an explicit source day plus selected destination-day checkboxes
 - Pre-release Instructions for Use are maintained in the GitHub Wiki and versioned in the repository
 - A local integration brand icon is bundled for current Home Assistant releases
+- Block 8 override scenarios and future Away/Calendar/Alarmo direction are documented without implementation
 
 Key decisions:
-- D-001 through D-048 are captured in DECISIONS.md
+- D-001 through D-050 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 

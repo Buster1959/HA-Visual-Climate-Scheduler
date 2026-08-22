@@ -6,6 +6,7 @@ Snapshot: 0.11.0-dev
 ## Added
 - `release_notes/RELEASE_NOTES_0.11.0-dev.md` — Block 7 release notes
 - `docs/INSTRUCTIONS_FOR_USE.md` — versioned pre-release user guide
+- `docs/OVERRIDE_AND_MODE_DESIGN.md` — recorded Block 8 override and future mode design
 - `custom_components/visual_climate_scheduler/brand/icon.png` — 256px transparent integration icon
 - `custom_components/visual_climate_scheduler/brand/icon@2x.png` — 512px high-density integration icon
 
@@ -19,6 +20,7 @@ Snapshot: 0.11.0-dev
 - `custom_components/visual_climate_scheduler/strings.json`
 - `custom_components/visual_climate_scheduler/translations/en.json`
 - `docs/DECISIONS.md`
+- `docs/PARKED.md`
 - `docs/PROJECT_MANIFEST.md`
 - `tests/test_rooms.py`
 
