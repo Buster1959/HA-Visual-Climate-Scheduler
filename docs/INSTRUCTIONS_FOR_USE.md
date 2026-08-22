@@ -1,6 +1,6 @@
-# Instructions for Use — Pre-release 0.11.0-dev
+# Instructions for Use — Pre-release 0.12.0-dev
 
-This guide describes the implemented Block 7 pre-release. It is suitable for
+This guide describes the implemented Block 8 pre-release. It is suitable for
 people happy to test an unfinished integration in a non-critical room or zone.
 
 ## Before you begin
@@ -48,7 +48,10 @@ Go to **Settings → Devices & services → Visual Climate Scheduler → Configu
 3. Select the room or zone to edit.
 4. Each day is independent. Add up to four periods in this first UI, set the
    period name, exact `HH:MM` start time and target temperature, then choose
-   **Save schedule**.
+   **Save schedule**. Each card also has a visual timeline: drag a point
+   left/right for time (15-minute steps), or up/down for target temperature
+   (0.5°C steps). Click a point to highlight its precise fields; use those
+   fields whenever an exact minute is needed.
 5. To reuse a day: choose its **Source** radio button, tick **Apply here** on
    one or more destination days, choose **Apply to selected days**, then Save.
    The copied days are independent afterwards.
@@ -67,5 +70,5 @@ Go to **Settings → Devices & services → Visual Climate Scheduler → Configu
 ## Reporting feedback
 
 When reporting a problem, include your Home Assistant version, the integration
-version (`0.11.0-dev`), the affected room/zone and the exact steps that led to
+version (`0.12.0-dev`), the affected room/zone and the exact steps that led to
 the result. Do not include secrets or full Home Assistant backups.

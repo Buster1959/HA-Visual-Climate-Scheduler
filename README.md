@@ -11,9 +11,9 @@ sidebar editor and the current limitations for this checkpoint.
 The integration includes its own Home Assistant brand icon for current Home
 Assistant releases.
 
-## Checkpoint 0.11.0-dev
+## Checkpoint 0.12.0-dev
 
-**Block 7 — Room Management & Day Apply**
+**Block 8 — Visual Timeline Slider Editor**
 
 The scheduler now has an optional, admin-only sidebar editor. In the
 integration's Configure menu, choose **Sidebar editor** and tick **Show
@@ -27,6 +27,11 @@ thermostats while keeping its daily schedules. The sidebar is the day-to-day
 schedule editor: choose a source day, tick **Apply here** on destination days,
 then choose **Apply to selected days** and Save. Hiding the sidebar checkbox
 removes the navigation item without deleting schedules.
+
+Every day card now has a visual temperature timeline. Drag a point left/right
+to move its time (15-minute steps) or up/down to change its target (0.5°C
+steps). Click a point to highlight its precise fields; those fields still allow
+exact `HH:MM` entry such as `09:12`.
 
 ## V1
 - Visual PC/tablet timeline editor

@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.11.0-dev
-Phase: Block 7 — Room Management & Day Apply
-Status: Scheduled spaces can be amended safely and daily schedules can be explicitly applied to selected days
+Project version: 0.12.0-dev
+Phase: Block 8 — Visual Timeline Slider Editor
+Status: Every independently scheduled day has a draggable temperature timeline plus exact controls
 
 ## Session checkpoint
 
@@ -41,15 +41,15 @@ Completed:
 - Pre-release Instructions for Use are maintained in the GitHub Wiki and versioned in the repository
 - A local integration brand icon is bundled for current Home Assistant releases
 - Block 8 override scenarios and future Away/Calendar/Alarmo direction are documented without implementation
+- Each day card has a temperature timeline with direct time/target point dragging and a visible scale
 
 Key decisions:
-- D-001 through D-050 are captured in DECISIONS.md
+- D-001 through D-051 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 
 Next session:
 - Add temporary overrides as a separate layer over the deterministic engine
-- Add richer timeline interaction
 
 ## Repository workflow
 
