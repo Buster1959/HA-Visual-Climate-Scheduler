@@ -17,6 +17,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     from .runtime import ScheduleRuntime
     from .services import async_register_services
     from .storage import ScheduleStorage
+    from .panel import async_sync_panel
+    from .websocket_api import async_register_commands
     from .zeal import async_discover_zeal_rooms
 
     storage = ScheduleStorage(hass, entry.entry_id)
@@ -32,6 +34,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "zeal_discovery": await async_discover_zeal_rooms(hass),
     }
     await async_register_services(hass)
+    async_register_commands(hass)
+    await async_sync_panel(hass, bool(configuration.settings.get("show_panel", False)))
     return True
 
 
@@ -43,4 +47,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not hass.data[DOMAIN]:
         hass.data.pop(DOMAIN)
         hass.services.async_remove(DOMAIN, "set_zeal_room_temperature")
+        from .panel import async_sync_panel
+
+        await async_sync_panel(hass, False)
     return True

@@ -36,7 +36,9 @@ Each config entry owns one JSON document through Home Assistant's Store helper:
       }
     }
   },
-  "settings": {}
+  "settings": {
+    "show_panel": true
+  }
 }
 ```
 
@@ -47,6 +49,9 @@ Each config entry owns one JSON document through Home Assistant's Store helper:
 - Copy helpers preserve a period's stable ID while creating detached day collections, so a copied day can later diverge without changing its source.
 - `area_id` is optional Home Assistant Area context. `climate_entity_ids` is a non-empty list of durable climate targets, so one scheduled room or zone can control one or many thermostats. A later discovery layer may report a target as unavailable, but must not remove the schedule.
 - Overrides, active periods, device availability and learning history are runtime state, not part of this document.
+- `settings.show_panel` is the optional sidebar-editor visibility preference. It
+  changes only Home Assistant navigation and is deliberately separate from
+  schedules and runtime execution state.
 
 ## Versioning and migration
 

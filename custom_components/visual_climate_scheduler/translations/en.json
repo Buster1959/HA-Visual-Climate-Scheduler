@@ -15,7 +15,8 @@
       "init": {
         "menu_options": {
           "add_scheduled_space": "Add a room or zone",
-          "remove_scheduled_space": "Remove a room or zone"
+          "remove_scheduled_space": "Remove a room or zone",
+          "panel_settings": "Sidebar editor"
         }
       },
       "add_scheduled_space": {
@@ -31,6 +32,13 @@
         "title": "Remove room or zone",
         "data": {
           "room_id": "Room or zone"
+        }
+      },
+      "panel_settings": {
+        "title": "Sidebar editor",
+        "description": "Show or hide the visual schedule editor in Home Assistant's sidebar.",
+        "data": {
+          "show_panel": "Show scheduler editor in sidebar"
         }
       }
     },

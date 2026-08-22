@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.9.0-dev
-Phase: Block 5 — Room & Zone Setup
-Status: Named scheduled spaces with one-to-many climate targets can be configured and persisted
+Project version: 0.10.0-dev
+Phase: Block 6 — Functional Schedule Editor
+Status: Optional native HA sidebar editor creates and persists schedules for configured spaces
 
 ## Session checkpoint
 
@@ -32,16 +32,19 @@ Completed:
 - Home Assistant runtime adapter applies startup targets and schedules the nearest transition
 - Options-flow setup for named rooms/zones and one or many climate targets added
 - V1 persisted data migrated from singular to plural climate target IDs
+- Optional admin-only sidebar editor can be enabled from the integration's Configure menu
+- Editor changes are validated by the durable data model, persisted through HA Store and applied to the running engine
+- First editor supports direct period name, exact time and temperature editing for seven independent days
+- Sidebar visibility is a persisted preference and never changes saved schedules
 
 Key decisions:
-- D-001 through D-042 are captured in DECISIONS.md
+- D-001 through D-044 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 
 Next session:
-- Connect the existing UI acceptance criteria to production UI work
-- Add the visual schedule editor for the configured rooms and zones
 - Add temporary overrides as a separate layer over the deterministic engine
+- Add explicit copy/apply-to-days actions and richer timeline interaction
 
 ## Repository workflow
 

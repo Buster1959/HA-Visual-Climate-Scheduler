@@ -2,14 +2,19 @@
 
 A modern Home Assistant climate scheduler built around independent daily schedules, visual editing, and real-world usability.
 
-## Checkpoint 0.9.0-dev
+## Checkpoint 0.10.0-dev
 
-**Block 5 — Room & Zone Setup**
+**Block 6 — Functional Schedule Editor**
 
-The scheduler can now store named rooms or zones with one or many climate
-thermostat targets. Configure each scheduled space from the integration's
-Configure button; the deterministic engine applies the same period to every
-target in that space.
+The scheduler now has an optional, admin-only sidebar editor. In the
+integration's Configure menu, choose **Sidebar editor** and tick **Show
+scheduler editor in sidebar**. The panel presents seven independent daily
+schedules for each configured room or zone, with exact time and temperature
+editing, up to four periods per day in this first UI.
+
+The integration Configure menu remains the place to add/remove rooms and
+zones. The sidebar is the day-to-day schedule editor. Hiding the checkbox
+removes the sidebar item without deleting schedules.
 
 ## V1
 - Visual PC/tablet timeline editor

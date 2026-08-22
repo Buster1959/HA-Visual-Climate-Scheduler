@@ -18,9 +18,12 @@ from .const import (
     CONF_CLIMATE_ENTITY_IDS,
     CONF_ROOM_ID,
     CONF_ROOM_NAME,
+    CONF_SHOW_PANEL,
     DOMAIN,
     INTEGRATION_TITLE,
 )
+from .configuration import async_save_configuration
+from .panel import async_sync_panel
 from .rooms import add_scheduled_space, remove_scheduled_space
 
 
@@ -58,7 +61,8 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
     ) -> config_entries.ConfigFlowResult:
         """Present the small room-setup menu."""
         return self.async_show_menu(
-            step_id="init", menu_options=["add_scheduled_space", "remove_scheduled_space"]
+            step_id="init",
+            menu_options=["add_scheduled_space", "remove_scheduled_space", "panel_settings"],
         )
 
     async def async_step_add_scheduled_space(
@@ -94,9 +98,7 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
                 except ValueError:
                     errors["base"] = "duplicate_climate_entity"
                 else:
-                    await entry_data["storage"].async_save(configuration)
-                    entry_data["configuration"] = configuration
-                    await entry_data["runtime"].async_set_configuration(configuration)
+                    await async_save_configuration(self.hass, self.config_entry.entry_id, configuration)
                     return self.async_create_entry(title="", data={})
 
         return self.async_show_form(
@@ -123,9 +125,7 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
             return self.async_abort(reason="no_scheduled_spaces")
         if user_input is not None:
             configuration = remove_scheduled_space(configuration, user_input[CONF_ROOM_ID])
-            await entry_data["storage"].async_save(configuration)
-            entry_data["configuration"] = configuration
-            await entry_data["runtime"].async_set_configuration(configuration)
+            await async_save_configuration(self.hass, self.config_entry.entry_id, configuration)
             return self.async_create_entry(title="", data={})
 
         choices = {
@@ -135,4 +135,32 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
         return self.async_show_form(
             step_id="remove_scheduled_space",
             data_schema=vol.Schema({vol.Required(CONF_ROOM_ID): vol.In(choices)}),
+        )
+
+    async def async_step_panel_settings(
+        self, user_input: dict[str, Any] | None = None
+    ) -> config_entries.ConfigFlowResult:
+        """Let the user show or hide the full schedule editor in the sidebar."""
+        entry_data = self.hass.data[DOMAIN][self.config_entry.entry_id]
+        configuration = entry_data["configuration"]
+        if user_input is not None:
+            settings = {**configuration.settings, CONF_SHOW_PANEL: user_input[CONF_SHOW_PANEL]}
+            updated_configuration = type(configuration)(
+                rooms=configuration.rooms, settings=settings
+            )
+            await async_save_configuration(
+                self.hass, self.config_entry.entry_id, updated_configuration
+            )
+            await async_sync_panel(self.hass, user_input[CONF_SHOW_PANEL])
+            return self.async_create_entry(title="", data={})
+        return self.async_show_form(
+            step_id="panel_settings",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_SHOW_PANEL,
+                        default=bool(configuration.settings.get(CONF_SHOW_PANEL, False)),
+                    ): selector({"boolean": {}})
+                }
+            ),
         )

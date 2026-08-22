@@ -48,6 +48,13 @@ class ScheduleModelTests(unittest.TestCase):
         self.assertEqual(restored.rooms["living_room"].days["monday"][0].time, "06:30")
         self.assertIn(f'"version": {SCHEMA_VERSION}', stored_json)
 
+    def test_sidebar_preference_round_trips_as_persisted_setting(self) -> None:
+        original = ScheduleConfiguration(settings={"show_panel": True})
+
+        restored = ScheduleConfiguration.from_dict(original.to_dict())
+
+        self.assertTrue(restored.settings["show_panel"])
+
     def test_seven_days_are_required_and_independent(self) -> None:
         with self.assertRaisesRegex(ValueError, "exactly monday through sunday"):
             room({"monday": ()})

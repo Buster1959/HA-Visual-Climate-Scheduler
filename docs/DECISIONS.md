@@ -42,3 +42,5 @@
 - **D-040** — A period remains active across midnight and across empty days until a later persisted period occurs. Active-period bookkeeping and timer callbacks are runtime state, never persisted configuration.
 - **D-041** — A scheduled space is one named room or zone with a non-empty list of climate targets. One and many targets use the same model; a schedule period applies its setpoint to every target.
 - **D-042** — A climate target may belong to only one scheduled space, preventing conflicting schedules. Area context is optional navigation metadata because a zone may span several Areas.
+- **D-043** — The full schedule editor is an optional, admin-only native Home Assistant sidebar panel. Its visibility is a persisted integration preference; hiding it removes navigation only, never schedules.
+- **D-044** — The panel edits one configured room/zone's seven daily lists through the same validated persistence model used everywhere else. The initial panel exposes up to four periods per day; Apply, Copy and temporary override controls remain visibly unavailable until their separate behaviour is implemented.

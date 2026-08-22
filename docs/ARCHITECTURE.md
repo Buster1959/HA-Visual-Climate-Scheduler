@@ -10,7 +10,7 @@ Visual Climate Scheduler
       +--> Schedule engine
       +--> Runtime state / overrides
       +--> Optional ZEAL discovery context
-      +--> PC/tablet visual editor
+      +--> Optional native HA sidebar schedule editor
       +--> Mobile quick-control
       |
       v
@@ -24,6 +24,15 @@ The scheduler does not control heat pumps, boilers, pumps or HVAC plant.
 
 ## Persistence
 Use Home Assistant's Store helper for versioned JSON-serialisable persistent configuration. Runtime state is kept separately and is not part of the persistent schedule model.
+
+## Sidebar editor
+The native Home Assistant sidebar editor is optional, admin-only and controlled
+by the persisted `settings.show_panel` preference from the integration's
+Configure menu. It reads and writes only the configuration document through a
+small admin-only WebSocket boundary. That boundary validates an edited seven-day
+room/zone document through the durable model before saving it and immediately
+refreshing the running deterministic scheduler. It does not introduce a second
+schedule model or persist runtime state.
 
 ## Optional ZEAL discovery
 When ZEAL is installed, the integration can discover ZEAL's canonical room

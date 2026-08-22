@@ -13,6 +13,11 @@ CONF_AREA_ID = "area_id"
 CONF_CLIMATE_ENTITY_IDS = "climate_entity_ids"
 CONF_ROOM_ID = "room_id"
 CONF_ROOM_NAME = "room_name"
+CONF_SHOW_PANEL = "show_panel"
+
+PANEL_COMPONENT = "visual-climate-scheduler-panel"
+PANEL_URL_PATH = DOMAIN
+PANEL_STATIC_URL = f"/{DOMAIN}_static"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = DOMAIN
