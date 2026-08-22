@@ -15,6 +15,8 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Invalid downstream selections are cleared after an upstream change.
 
 ## First-time room
+- With no scheduled spaces, Configure opens **Rooms and zones**, not an empty schedule.
+- When ZEAL is present, adding or modifying a space lists only ZEAL room thermostats.
 - A new room offers sensible presets before requiring manual schedule creation.
 - User can choose a preset or copy an existing room.
 - A copied schedule can subsequently be changed independently.
@@ -51,6 +53,8 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Confirm destination schedules match but are independent afterwards.
 - Confirm destination name, Area and thermostat assignments are unchanged.
 - Confirm temporary overrides and future learning history are not copied.
+- Use **Select all** to choose every destination, then **Clear all** to deselect
+  every destination.
 
 ## ZEAL navigation prototype
 - Zone is the preferred top-level selector when ZEAL is present.
@@ -78,6 +82,8 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Vertical dragging changes the setpoint visually.
 - Dragging has a non-drag numeric alternative.
 - Heating/cooling temperature ranges remain readable.
+- A day begins at the final target from the previous populated day and the line
+  stays there until that day's first transition.
 
 ## Temperature-unit safety
 

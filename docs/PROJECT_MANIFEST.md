@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.16.1-dev
+Project version: 0.16.2-dev
 Phase: Block 12 — Open Scheduler from the Integration
-Status: The full admin-only scheduler is available from the integration's Configure action, with a separately optional sidebar shortcut and versioned panel assets
+Status: The direct editor has a first-time setup view, ZEAL-aware thermostat selection, copy shortcuts, continuous daily timelines and versioned panel assets
 
 ## Session checkpoint
 
@@ -47,9 +47,11 @@ Completed:
 - Schedule storage records `°C` or `°F` at initial setup and rejects a changed HA unit rather than silently applying misleading targets
 - The scheduler is registered as the integration configuration panel and remains directly available when the optional sidebar shortcut is hidden
 - Bundled panel assets use a versioned URL so an integration update does not reuse a stale browser-cached editor
+- Empty installations open directly to room/zone setup; ZEAL installations list only ZEAL thermostats during setup
+- Copying schedules offers Select all / Clear all and timelines visibly carry the prior day's final target across midnight
 
 Key decisions:
-- D-001 through D-054 are captured in DECISIONS.md
+- D-001 through D-055 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 

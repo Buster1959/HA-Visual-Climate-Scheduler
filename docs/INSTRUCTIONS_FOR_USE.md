@@ -1,4 +1,4 @@
-# Instructions for Use — Pre-release 0.16.1-dev
+# Instructions for Use — Pre-release 0.16.2-dev
 
 This guide describes the implemented Block 12 pre-release. It is suitable for
 people happy to test an unfinished integration in a non-critical room or zone.
@@ -30,6 +30,9 @@ calendar, clock and heat icon included with this release after the restart.
 
 Go to **Settings → Devices & services → Visual Climate Scheduler → Configure**,
 then open **Rooms and zones**.
+
+If no rooms or zones exist yet, this is the screen that opens first. When ZEAL
+is installed, it lists only ZEAL's room thermostat entities for assignment.
 
 - **Add a room or zone** creates a named scheduled space. Select every climate
   thermostat that should receive the same target.
@@ -67,9 +70,14 @@ unit.
    The copied days are independent afterwards.
 5. To copy a complete seven-day schedule to another room or zone, select the
    finished source room, expand **Copy schedule to rooms**, tick the destination
-   rooms and choose **Copy to selected rooms**. This also saves any current
+   rooms (or use **Select all**) and choose **Copy to selected rooms**. The
+   same button changes to **Clear all** when every destination is selected. This also saves any current
    source edits. It replaces only each destination's daily schedule; its name,
    Area and selected thermostats are unchanged.
+
+The visual line at the beginning of a day continues the final target from the
+previous populated day. For example, a Monday evening target of 18°C remains at
+18°C at the beginning of Tuesday until Tuesday's first change.
 
 ### Optional sidebar shortcut
 
@@ -101,5 +109,5 @@ Assistant restarts.
 ## Reporting feedback
 
 When reporting a problem, include your Home Assistant version, the integration
-version (`0.16.1-dev`), the affected room/zone and the exact steps that led to
+version (`0.16.2-dev`), the affected room/zone and the exact steps that led to
 the result. Do not include secrets or full Home Assistant backups.

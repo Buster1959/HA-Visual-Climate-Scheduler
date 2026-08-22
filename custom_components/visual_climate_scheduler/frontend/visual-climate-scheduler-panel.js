@@ -18,6 +18,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     this._quickExactTarget = "";
     this._spaceDraft = null;
     this._areas = [];
+    this._setupContext = { zeal_installed: false, zeal_thermostats: [] };
     this._message = "";
     this.shadowRoot.addEventListener("click", (event) => this._onClick(event));
     this.shadowRoot.addEventListener("change", (event) => this._onChange(event));
@@ -46,9 +47,11 @@ class VisualClimateSchedulerPanel extends HTMLElement {
       if (!this._roomId || !this._configuration.rooms[this._roomId]) {
         this._roomId = Object.keys(this._configuration.rooms)[0] || null;
       }
+      if (!this._roomId) this._view = "manage";
       this._loadRoom();
-      await this._loadAreas();
+      await Promise.all([this._loadAreas(), this._loadSetupContext()]);
       await this._loadQuick(false);
+      this._render();
     } catch (error) {
       this._message = `Could not load schedules: ${error.message || error}`;
       this._render();
@@ -74,6 +77,11 @@ class VisualClimateSchedulerPanel extends HTMLElement {
   async _loadAreas() {
     try { this._areas = await this._hass.callWS({ type: "config/area_registry/list" }); }
     catch (_) { this._areas = []; }
+  }
+
+  async _loadSetupContext() {
+    try { this._setupContext = await this._hass.callWS({ type: "visual_climate_scheduler/get_setup_context" }); }
+    catch (_) { this._setupContext = { zeal_installed: false, zeal_thermostats: [] }; }
   }
 
   async _onChange(event) {
@@ -145,6 +153,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     if (action === "quick-apply") { await this._applyQuick(); return; }
     if (action === "quick-cancel") { await this._cancelQuick(button.dataset.roomId); return; }
     if (action === "copy-room-schedule") { await this._copyRoomSchedule(); return; }
+    if (action === "copy-targets-toggle") { this._toggleCopyTargets(); return; }
     if (action === "manage-new") { this._startSpaceDraft(); return; }
     if (action === "manage-edit") { this._startSpaceDraft(button.dataset.roomId); return; }
     if (action === "manage-cancel") { this._spaceDraft = null; this._render(); return; }
@@ -239,6 +248,17 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     this._render();
   }
 
+  _copyDestinationIds() {
+    return Object.keys(this._configuration?.rooms || {}).filter((roomId) => roomId !== this._roomId);
+  }
+
+  _toggleCopyTargets() {
+    const destinations = this._copyDestinationIds();
+    const allSelected = destinations.length > 0 && destinations.every((roomId) => this._copyTargets.has(roomId));
+    this._copyTargets = allSelected ? new Set() : new Set(destinations);
+    this._render();
+  }
+
   _quickReferenceTarget() {
     if (this._quickSelected.size !== 1) return null;
     const room = this._quick.rooms.find((candidate) => this._quickSelected.has(candidate.id));
@@ -289,9 +309,24 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
   }
 
-  _temperatureRange(periods) {
+  _temperatureAtStartOfDay(day) {
+    const days = Object.keys(this._days || {});
+    const dayIndex = days.indexOf(day);
+    if (dayIndex < 0) return null;
+    for (let offset = 1; offset <= days.length; offset += 1) {
+      const previous = this._days[days[(dayIndex - offset + days.length) % days.length]];
+      if (!previous?.length) continue;
+      const ordered = [...previous].sort((left, right) => left.time.localeCompare(right.time));
+      const last = ordered[ordered.length - 1];
+      return Number(last.temperature);
+    }
+    return null;
+  }
+
+  _temperatureRange(periods, carryTemperature = null) {
     const bounds = this._temperatureBounds();
     const values = periods.map((period) => Number(period.temperature));
+    if (carryTemperature !== null) values.push(carryTemperature);
     const middle = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : bounds.defaultValue;
     let minimum = Math.floor(Math.min(...values, middle) - 2);
     let maximum = Math.ceil(Math.max(...values, middle) + 2);
@@ -304,7 +339,8 @@ class VisualClimateSchedulerPanel extends HTMLElement {
 
   _renderTimeline(day) {
     const periods = this._days[day];
-    const { minimum, maximum } = this._temperatureRange(periods);
+    const carryTemperature = this._temperatureAtStartOfDay(day);
+    const { minimum, maximum } = this._temperatureRange(periods, carryTemperature);
     const ordered = periods
       .map((period, index) => ({ period, index }))
       .sort((left, right) => left.period.time.localeCompare(right.period.time));
@@ -316,8 +352,10 @@ class VisualClimateSchedulerPanel extends HTMLElement {
       temperature: Number(period.temperature),
     }));
     let path = "";
-    if (coordinates.length) {
-      path = `M 0 ${coordinates[0].y.toFixed(2)}`;
+    if (coordinates.length || carryTemperature !== null) {
+      const startTemperature = carryTemperature ?? coordinates[0].temperature;
+      const startY = ((maximum - startTemperature) / (maximum - minimum)) * 100;
+      path = `M 0 ${startY.toFixed(2)}`;
       for (let index = 0; index < coordinates.length; index += 1) {
         const point = coordinates[index];
         path += ` H ${point.x.toFixed(2)}`;
@@ -327,7 +365,8 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     }
     const points = coordinates.map(({ index, x, y, temperature }) => `
       <button class="timeline-point" data-action="timeline-point" data-day="${day}" data-index="${index}" style="left:${x}%;top:${y}%" title="Drag to change time and target" aria-label="${this._escape(day)} ${this._escape(periods[index].name)}: ${periods[index].time}, ${this._formatTemperature(temperature)}">${this._formatTemperature(temperature)}</button>`).join("");
-    return `<div class="visual-editor"><div class="timeline-title">Visual editor <span>Drag a point: left/right changes time; up/down changes target.</span></div><div class="timeline-shell"><div class="temperature-scale"><span>${this._formatTemperature(maximum)}</span><span>${this._formatTemperature(Math.round((minimum + maximum) / 2))}</span><span>${this._formatTemperature(minimum)}</span></div><div><div class="timeline-plot" data-timeline-day="${day}" data-temp-min="${minimum}" data-temp-max="${maximum}"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>${points}</div><div class="time-scale"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div></div></div></div>`;
+    const continuity = carryTemperature === null ? "" : ` Continues from the previous day at ${this._formatTemperature(carryTemperature)}.`;
+    return `<div class="visual-editor"><div class="timeline-title">Visual editor <span>Drag a point: left/right changes time; up/down changes target.${continuity}</span></div><div class="timeline-shell"><div class="temperature-scale"><span>${this._formatTemperature(maximum)}</span><span>${this._formatTemperature(Math.round((minimum + maximum) / 2))}</span><span>${this._formatTemperature(minimum)}</span></div><div><div class="timeline-plot" data-timeline-day="${day}" data-temp-min="${minimum}" data-temp-max="${maximum}"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"/></svg>${points}</div><div class="time-scale"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div></div></div></div>`;
   }
 
   _onPointerDown(event) {
@@ -476,10 +515,17 @@ class VisualClimateSchedulerPanel extends HTMLElement {
       .filter(([roomId]) => roomId !== this._roomId)
       .map(([roomId, room]) => `<label><input type="checkbox" data-action="copy-target" value="${this._escape(roomId)}" ${this._copyTargets.has(roomId) ? "checked" : ""}> ${this._escape(room.name)}</label>`)
       .join("");
-    return `<details class="copy-schedule"><summary>Copy schedule to rooms</summary><p class="subtitle">This saves the current seven-day schedule and replaces the schedules of the selected rooms. Their names, areas and thermostats stay unchanged.</p><div class="copy-targets">${destinations || "No other rooms or zones are available."}</div><button data-action="copy-room-schedule" ${this._copyTargets.size ? "" : "disabled"}>Copy to selected rooms</button></details>`;
+    const targetIds = this._copyDestinationIds();
+    const allSelected = targetIds.length > 0 && targetIds.every((roomId) => this._copyTargets.has(roomId));
+    return `<details class="copy-schedule"><summary>Copy schedule to rooms</summary><p class="subtitle">This saves the current seven-day schedule and replaces the schedules of the selected rooms. Their names, areas and thermostats stay unchanged.</p><button class="secondary small" data-action="copy-targets-toggle" ${targetIds.length ? "" : "disabled"}>${allSelected ? "Clear all" : "Select all"}</button><div class="copy-targets">${destinations || "No other rooms or zones are available."}</div><button data-action="copy-room-schedule" ${this._copyTargets.size ? "" : "disabled"}>Copy to selected rooms</button></details>`;
   }
 
   _climateTargets() {
+    if (this._setupContext?.zeal_installed) {
+      return (this._setupContext.zeal_thermostats || [])
+        .map((thermostat) => [thermostat.entity_id, { attributes: { friendly_name: thermostat.name }, zone_name: thermostat.zone_name }])
+        .sort(([left], [right]) => left.localeCompare(right));
+    }
     return Object.entries(this._hass?.states || {})
       .filter(([entityId]) => entityId.startsWith("climate."))
       .sort(([left], [right]) => left.localeCompare(right));
@@ -491,8 +537,9 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     const roomCards = Object.entries(rooms).map(([roomId, room]) => `<article class="space-card"><div><h2>${this._escape(room.name)}</h2><p>${room.climate_entity_ids.length} thermostat${room.climate_entity_ids.length === 1 ? "" : "s"}${room.area_id ? ` · Area: ${this._escape(room.area_id)}` : ""}</p></div><div><button class="secondary small" data-action="manage-edit" data-room-id="${this._escape(roomId)}">Modify</button><button class="danger small" data-action="manage-remove" data-room-id="${this._escape(roomId)}">Remove</button></div></article>`).join("");
     const draft = this._spaceDraft;
     const areaOptions = (this._areas || []).sort((left, right) => left.name.localeCompare(right.name)).map((area) => `<option value="${this._escape(area.area_id)}" ${draft?.area_id === area.area_id ? "selected" : ""}>${this._escape(area.name)}</option>`).join("");
-    const targets = this._climateTargets().map(([entityId, state]) => `<label class="target-option"><input type="checkbox" data-action="space-target" value="${this._escape(entityId)}" ${draft?.climate_entity_ids.includes(entityId) ? "checked" : ""}><span>${this._escape(state.attributes.friendly_name || entityId)}<small>${this._escape(entityId)}</small></span></label>`).join("");
-    const editor = draft ? `<section class="space-editor"><h2>${draft.id ? "Modify room or zone" : "Add a room or zone"}</h2><label>Name<input data-action="space-name" value="${this._escape(draft.name)}" placeholder="e.g. Lounge"></label><label>Home Assistant Area (optional)<select data-action="space-area"><option value="">No Area</option>${areaOptions}</select></label><p class="subtitle">Select every climate thermostat that should receive this schedule (${unit}). A thermostat can only belong to one scheduled space.</p><div class="target-options">${targets || "No climate entities are currently available."}</div><div class="space-actions"><button data-action="manage-save">Save room or zone</button><button class="secondary" data-action="manage-cancel">Cancel</button></div></section>` : "";
+    const targets = this._climateTargets().map(([entityId, state]) => `<label class="target-option"><input type="checkbox" data-action="space-target" value="${this._escape(entityId)}" ${draft?.climate_entity_ids.includes(entityId) ? "checked" : ""}><span>${this._escape(state.attributes.friendly_name || entityId)}<small>${this._escape(entityId)}${state.zone_name ? ` · ${this._escape(state.zone_name)}` : ""}</small></span></label>`).join("");
+    const zealNote = this._setupContext?.zeal_installed ? " ZEAL is installed, so only its room thermostats are listed." : "";
+    const editor = draft ? `<section class="space-editor"><h2>${draft.id ? "Modify room or zone" : "Add a room or zone"}</h2><label>Name<input data-action="space-name" value="${this._escape(draft.name)}" placeholder="e.g. Lounge"></label><label>Home Assistant Area (optional)<select data-action="space-area"><option value="">No Area</option>${areaOptions}</select></label><p class="subtitle">Select every climate thermostat that should receive this schedule (${unit}). A thermostat can only belong to one scheduled space.${zealNote}</p><div class="target-options">${targets || "No eligible climate thermostats are currently available."}</div><div class="space-actions"><button data-action="manage-save">Save room or zone</button><button class="secondary" data-action="manage-cancel">Cancel</button></div></section>` : "";
     const sidebarEnabled = Boolean(this._configuration?.settings?.show_panel);
     return `<section class="manage-page"><div class="manage-header"><div><h2>Rooms and zones</h2><p class="subtitle">One schedule can set one or many thermostats in the same room or zone.</p></div><button data-action="manage-new">+ Add room or zone</button></div>${editor}<div class="spaces">${roomCards || '<p class="empty">No rooms or zones configured yet.</p>'}</div><section class="sidebar-setting"><label><input type="checkbox" data-action="sidebar-shortcut" ${sidebarEnabled ? "checked" : ""}> Show Climate Scheduler in the sidebar</label><p class="subtitle">This is only a shortcut. The scheduler is always available from this integration.</p></section></section>`;
   }

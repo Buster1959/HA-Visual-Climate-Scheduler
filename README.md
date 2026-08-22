@@ -12,9 +12,9 @@ limitations for this checkpoint.
 The integration includes its own Home Assistant brand icon for current Home
 Assistant releases.
 
-## Checkpoint 0.16.1-dev
+## Checkpoint 0.16.2-dev
 
-**Block 12 — Open Scheduler from the Integration (cache repair)**
+**Block 12 — Setup and schedule-editor refinements**
 
 Open the full, admin-only scheduler from **Settings → Devices & services →
 Visual Climate Scheduler → Configure**, without adding anything to the
@@ -25,6 +25,11 @@ editing, up to four periods per day in this first UI.
 
 The bundled editor has a versioned browser asset URL, so installing an update
 also loads its matching screen instead of retaining an earlier cached editor.
+
+When no rooms have been configured, the editor starts on **Rooms and zones**.
+If ZEAL is installed, that setup view shows only ZEAL room thermostats. Timeline
+lines now continue the final target from the previous day across midnight, and
+schedule copying has a **Select all** / **Clear all** shortcut.
 
 Open **Rooms and zones** in the scheduler to add, modify or remove rooms and
 zones. Modify keeps the stable room and its daily schedules, so it is the place
