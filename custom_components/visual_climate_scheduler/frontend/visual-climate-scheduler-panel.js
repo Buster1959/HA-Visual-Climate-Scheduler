@@ -9,6 +9,11 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     this._selectedDays = new Set();
     this._selectedPeriod = null;
     this._drag = null;
+    this._view = "schedule";
+    this._quick = { rooms: [] };
+    this._quickSelected = new Set();
+    this._quickDuration = "2h";
+    this._quickAction = null;
     this._message = "";
     this.shadowRoot.addEventListener("click", (event) => this._onClick(event));
     this.shadowRoot.addEventListener("change", (event) => this._onChange(event));
@@ -38,6 +43,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
         this._roomId = Object.keys(this._configuration.rooms)[0] || null;
       }
       this._loadRoom();
+      await this._loadQuick(false);
     } catch (error) {
       this._message = `Could not load schedules: ${error.message || error}`;
       this._render();
@@ -52,6 +58,12 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     this._selectedPeriod = null;
     if (clearMessage) this._message = "";
     this._render();
+  }
+
+  async _loadQuick(render = true) {
+    try { this._quick = await this._hass.callWS({ type: "visual_climate_scheduler/get_quick_change" }); }
+    catch (error) { this._message = `Could not load Quick Change: ${error.message || error}`; }
+    if (render) this._render();
   }
 
   _onChange(event) {
@@ -72,6 +84,12 @@ class VisualClimateSchedulerPanel extends HTMLElement {
       this._render();
       return;
     }
+    if (target.dataset.action === "quick-room") {
+      if (target.checked) this._quickSelected.add(target.value); else this._quickSelected.delete(target.value);
+      this._render(); return;
+    }
+    if (target.dataset.action === "quick-duration") { this._quickDuration = target.value; return; }
+    if (target.dataset.action === "quick-temperature") { this._quickAction = { operation: "temperature", value: Number(target.value) }; return; }
     const { day, index, field } = target.dataset;
     if (!day || index === undefined || !field) return;
     const period = this._days[day][Number(index)];
@@ -79,10 +97,15 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     if (field === "name" && !period.friendly_name) period.friendly_name = this._slug(target.value);
   }
 
-  _onClick(event) {
+  async _onClick(event) {
     const button = event.target.closest("button");
     if (!button || button.disabled) return;
     const { action, day, index } = button.dataset;
+    if (action === "view") { this._view = button.dataset.view; await this._loadQuick(false); this._render(); return; }
+    if (action === "quick-all") { this._quickSelected = new Set(this._quick.rooms.map((room) => room.id)); this._render(); return; }
+    if (action === "quick-delta") { this._quickAction = { operation: "delta", value: Number(button.dataset.value) }; this._render(); return; }
+    if (action === "quick-apply") { await this._applyQuick(); return; }
+    if (action === "quick-cancel") { await this._cancelQuick(button.dataset.roomId); return; }
     if (action === "timeline-point") {
       this._selectedPeriod = { day, index: Number(index) };
       this._render();
@@ -91,7 +114,23 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     if (action === "add") this._addPeriod(day);
     if (action === "remove") this._days[day].splice(Number(index), 1);
     if (action === "apply") this._applyToSelectedDays();
-    if (action === "save") this._save();
+    if (action === "save") { await this._save(); return; }
+    this._render();
+  }
+
+  async _applyQuick() {
+    if (!this._quickSelected.size) { this._message = "Choose one or more rooms/zones, or select Whole house."; this._render(); return; }
+    if (!this._quickAction || !Number.isFinite(this._quickAction.value)) { this._message = "Choose +/− adjustment or enter an exact target temperature."; this._render(); return; }
+    try {
+      this._quick = await this._hass.callWS({ type: "visual_climate_scheduler/set_temporary_override", room_ids: [...this._quickSelected], duration: this._quickDuration, ...this._quickAction });
+      this._message = "Temporary hold applied. It will automatically return to the schedule.";
+    } catch (error) { this._message = `Not applied: ${error.message || error}`; }
+    this._render();
+  }
+
+  async _cancelQuick(roomId) {
+    this._quick = await this._hass.callWS({ type: "visual_climate_scheduler/clear_temporary_override", room_id: roomId });
+    this._message = "Temporary hold cancelled; the scheduled target has resumed.";
     this._render();
   }
 
@@ -264,11 +303,19 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     return `<section class="day-card"><div class="day-heading"><h2>${day}</h2><label><input type="radio" name="source-day" data-action="source-day" value="${day}" ${this._sourceDay === day ? "checked" : ""}> Source</label><label><input type="checkbox" data-action="target-day" value="${day}" ${this._selectedDays.has(day) ? "checked" : ""}> Apply here</label></div>${this._renderTimeline(day)}<div class="labels"><span>Name</span><span>Time</span><span>Target</span></div>${rows || '<p class="empty">No periods yet.</p>'}<button class="secondary" data-action="add" data-day="${day}" ${periods.length >= 4 ? "disabled" : ""}>+ Add period</button></section>`;
   }
 
+  _renderQuick() {
+    const rooms = this._quick.rooms || [];
+    const cards = rooms.map((room) => `<label class="quick-room"><input type="checkbox" data-action="quick-room" value="${this._escape(room.id)}" ${this._quickSelected.has(room.id) ? "checked" : ""}><span><b>${this._escape(room.name)}</b><small>${room.override ? `Holding ${room.override.temperature}° until ${new Date(room.override.expires_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : `Scheduled ${room.scheduled_temperature ?? "—"}°`}</small></span>${room.override ? `<button data-action="quick-cancel" data-room-id="${this._escape(room.id)}">Cancel hold</button>` : ""}</label>`).join("");
+    const action = this._quickAction ? (this._quickAction.operation === "delta" ? `${this._quickAction.value > 0 ? "+" : ""}${this._quickAction.value}° from scheduled target` : `${this._quickAction.value}° exact target`) : "Choose an adjustment or exact target";
+    return `<section class="quick-page"><div class="quick-header"><div><h2>Quick Change</h2><p class="subtitle">Temporary changes only. Saved weekly schedules are not edited.</p></div><button class="secondary small" data-action="quick-all">Whole house</button></div><div class="quick-rooms">${cards || '<p class="empty">No rooms or zones configured.</p>'}</div><section class="quick-controls"><h2>Change</h2><div class="quick-actions"><button data-action="quick-delta" data-value="-2">−2°</button><button data-action="quick-delta" data-value="-1">−1°</button><button data-action="quick-delta" data-value="1">+1°</button><button data-action="quick-delta" data-value="2">+2°</button><label>Exact target <input data-action="quick-temperature" type="number" step="0.5" placeholder="21"></label></div><p class="chosen">${this._escape(action)}</p><div class="durations"><label><input type="radio" name="quick-duration" data-action="quick-duration" value="2h" ${this._quickDuration === "2h" ? "checked" : ""}> 2 hours</label><label><input type="radio" name="quick-duration" data-action="quick-duration" value="4h" ${this._quickDuration === "4h" ? "checked" : ""}> 4 hours</label><label><input type="radio" name="quick-duration" data-action="quick-duration" value="next_change" ${this._quickDuration === "next_change" ? "checked" : ""}> Until next change</label></div><button data-action="quick-apply">Apply temporary hold</button></section></section>`;
+  }
+
   _render() {
     const rooms = this._configuration?.rooms || {};
     const brandIconUrl = this._hass?.hassUrl?.("/api/brands/integration/visual_climate_scheduler/icon.png") || "/api/brands/integration/visual_climate_scheduler/icon.png";
     const options = Object.entries(rooms).map(([id, room]) => `<option value="${this._escape(id)}" ${id === this._roomId ? "selected" : ""}>${this._escape(room.name)} · ${room.climate_entity_ids.length} thermostat${room.climate_entity_ids.length === 1 ? "" : "s"}</option>`).join("");
     const editor = this._days ? `<div class="week">${Object.keys(this._days).map((day) => this._renderPeriods(day)).join("")}</div>` : `<div class="blank"><h2>No rooms or zones configured</h2><p>Open the integration’s Configure menu and add a room or zone before creating schedules.</p></div>`;
+    const content = this._view === "quick" ? this._renderQuick() : `${editor}<div class="advanced"><h2>Apply schedule</h2><p class="subtitle">Choose one Source day, tick Apply here on the destination days, then save.</p><button data-action="apply" ${this._days ? "" : "disabled"}>Apply to selected days</button><button data-action="view" data-view="quick">Quick Change</button><button data-action="save" ${this._days ? "" : "disabled"}>Save schedule</button></div>`;
     this.shadowRoot.innerHTML = `
       <style>
         :host { display:block; min-height:100%; background:var(--primary-background-color); color:var(--primary-text-color); font-family:var(--primary-font-family, sans-serif); }
@@ -283,14 +330,14 @@ class VisualClimateSchedulerPanel extends HTMLElement {
         .day-card, .blank, .advanced { background:var(--card-background-color); box-shadow:var(--ha-card-box-shadow, 0 1px 3px #0002); border-radius:12px; padding:18px; }.day-heading { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }.day-heading h2 { margin:0 auto 0 0; }.day-heading label { display:flex; align-items:center; gap:4px; color:var(--secondary-text-color); font-size:13px; white-space:nowrap; }.day-heading input { min-height:auto; }
         .visual-editor { margin:0 0 14px; }.timeline-title { display:flex; justify-content:space-between; gap:8px; align-items:baseline; color:var(--primary-text-color); font-size:13px; font-weight:700; }.timeline-title span { color:var(--secondary-text-color); font-size:11px; font-weight:400; text-align:right; }.timeline-shell { display:grid; grid-template-columns:30px 1fr; gap:6px; margin-top:8px; }.temperature-scale { height:130px; display:flex; flex-direction:column; justify-content:space-between; align-items:flex-end; color:var(--secondary-text-color); font-size:10px; padding:1px 0; }.timeline-plot { height:130px; position:relative; overflow:visible; border-left:1px solid var(--divider-color); border-bottom:1px solid var(--divider-color); background:repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), var(--divider-color) calc(25% - 1px), var(--divider-color) 25%), repeating-linear-gradient(0deg, transparent 0, transparent calc(25% - 1px), var(--divider-color) calc(25% - 1px), var(--divider-color) 25%); }.timeline-plot svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; }.timeline-plot path { fill:none; stroke:var(--primary-color); stroke-width:2; vector-effect:non-scaling-stroke; }.timeline-point { position:absolute; transform:translate(-50%, -50%); z-index:2; width:31px; min-width:31px; min-height:31px; height:31px; padding:0; border:2px solid var(--card-background-color); border-radius:50%; background:var(--primary-color); color:var(--text-primary-color); box-shadow:0 0 0 1px var(--primary-color); font-size:10px; font-weight:700; touch-action:none; cursor:grab; }.timeline-point:active { cursor:grabbing; }.time-scale { display:flex; justify-content:space-between; color:var(--secondary-text-color); font-size:10px; margin-top:4px; }.labels, .period-row { display:grid; grid-template-columns:minmax(96px,1.5fr) 86px 78px 14px 32px; gap:7px; align-items:center; }
         .labels { color:var(--secondary-text-color); font-size:12px; margin-bottom:4px; padding:0 4px; }.period-row { margin:7px 0; border-radius:6px; }.period-row.selected { outline:2px solid var(--primary-color); outline-offset:2px; }.period-row input:first-child { min-width:0; }
-        .advanced { margin-top:22px; }.advanced button { margin:0 8px 8px 0; }.blank { text-align:center; padding:48px; }
+        .advanced { margin-top:22px; }.advanced button { margin:0 8px 8px 0; }.blank { text-align:center; padding:48px; }.view-tabs { display:flex; gap:8px; margin:0 0 18px; }.view-tabs button.active { outline:3px solid var(--primary-color); outline-offset:2px; }.quick-page { display:grid; gap:16px; }.quick-header { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; }.quick-header h2 { margin:0; }.small { width:auto !important; }.quick-rooms { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:12px; }.quick-room, .quick-controls { background:var(--card-background-color); box-shadow:var(--ha-card-box-shadow, 0 1px 3px #0002); border-radius:12px; padding:15px; }.quick-room { display:flex; gap:10px; align-items:center; }.quick-room input { min-height:auto; }.quick-room span { display:grid; gap:3px; flex:1; }.quick-room small { color:var(--secondary-text-color); }.quick-room button { background:var(--secondary-background-color); color:var(--primary-text-color); min-height:32px; padding:0 9px; }.quick-controls { max-width:760px; }.quick-actions, .durations { display:flex; gap:9px; flex-wrap:wrap; align-items:end; }.quick-actions label { display:grid; gap:4px; font-size:12px; }.quick-actions input { width:92px; }.chosen { color:var(--secondary-text-color); }.durations label { display:flex; align-items:center; gap:4px; }.durations input { min-height:auto; }
         @media (max-width:600px) { main { padding:16px; } select { min-width:100%; } .timeline-title { display:block; }.timeline-title span { display:block; text-align:left; margin-top:3px; }.period-row { grid-template-columns:1fr 78px 67px 12px 28px; gap:4px; } }
       </style>
       <main>
-        <header><div class="title"><img class="brand-icon" src="${brandIconUrl}" alt=""><div><h1>Visual Climate Scheduler</h1><p class="subtitle">Seven independent daily schedules. Changes save immediately.</p></div></div><label>Scheduled space<br><select data-action="room">${options}</select></label></header>
+        <header><div class="title"><img class="brand-icon" src="${brandIconUrl}" alt=""><div><h1>Visual Climate Scheduler</h1><p class="subtitle">Seven independent daily schedules. Changes save immediately.</p></div></div>${this._view === "schedule" ? `<label>Scheduled space<br><select data-action="room">${options}</select></label>` : ""}</header>
         ${this._message ? `<p class="notice">${this._escape(this._message)}</p>` : ""}
-        ${editor}
-        <div class="advanced"><h2>Apply schedule</h2><p class="subtitle">Choose one Source day, tick Apply here on the destination days, then save.</p><button data-action="apply" ${this._days ? "" : "disabled"}>Apply to selected days</button><button disabled>Temporary override</button><button data-action="save" ${this._days ? "" : "disabled"}>Save schedule</button></div>
+        <nav class="view-tabs"><button class="${this._view === "schedule" ? "active" : ""}" data-action="view" data-view="schedule">Schedule</button><button class="${this._view === "quick" ? "active" : ""}" data-action="view" data-view="quick">Quick Change</button></nav>
+        ${content}
       </main>`;
   }
 }

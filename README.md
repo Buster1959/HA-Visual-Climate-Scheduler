@@ -11,9 +11,9 @@ sidebar editor and the current limitations for this checkpoint.
 The integration includes its own Home Assistant brand icon for current Home
 Assistant releases.
 
-## Checkpoint 0.12.0-dev
+## Checkpoint 0.13.0-dev
 
-**Block 8 — Visual Timeline Slider Editor**
+**Block 9 — Quick Change & Temporary Overrides**
 
 The scheduler now has an optional, admin-only sidebar editor. In the
 integration's Configure menu, choose **Sidebar editor** and tick **Show
@@ -32,6 +32,10 @@ Every day card now has a visual temperature timeline. Drag a point left/right
 to move its time (15-minute steps) or up/down to change its target (0.5°C
 steps). Click a point to highlight its precise fields; those fields still allow
 exact `HH:MM` entry such as `09:12`.
+
+Use **Quick Change** for temporary holds without cluttering the Schedule view:
+select rooms/zones (or Whole house), choose a `+/-` adjustment or exact target,
+then hold it for 2 hours, 4 hours or until the next scheduled change.
 
 ## V1
 - Visual PC/tablet timeline editor

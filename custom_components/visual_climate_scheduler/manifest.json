@@ -8,5 +8,5 @@
   "documentation": "https://github.com/Buster1959/HA-Visual-Climate-Scheduler",
   "integration_type": "service",
   "iot_class": "local_push",
-  "version": "0.12.0"
+  "version": "0.13.0"
 }

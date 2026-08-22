@@ -14,6 +14,7 @@ from homeassistant.util import dt as dt_util
 
 from .engine import ScheduledPeriod, active_period_at, next_transition_after
 from .models import RoomSchedule, ScheduleConfiguration
+from .overrides import TemporaryOverride, create_temporary_overrides
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ class ScheduleRuntime:
         self._configuration = ScheduleConfiguration.empty()
         self._cancel_next: Callable[[], None] | None = None
         self._applied_periods: dict[str, tuple[datetime, str]] = {}
+        self._overrides: dict[str, TemporaryOverride] = {}
 
     async def async_start(self, configuration: ScheduleConfiguration) -> None:
         """Start from persisted configuration and reconcile current targets."""
@@ -40,6 +42,7 @@ class ScheduleRuntime:
         """Cancel pending callbacks and discard ephemeral runtime state."""
         self._cancel_pending_transition()
         self._applied_periods.clear()
+        self._overrides.clear()
 
     async def async_set_configuration(self, configuration: ScheduleConfiguration) -> None:
         """Replace configuration, reconcile immediately, and arrange its next change.
@@ -49,6 +52,7 @@ class ScheduleRuntime:
         persisted, allowing edited active periods to take effect immediately.
         """
         self._configuration = configuration
+        self._overrides = {room_id: override for room_id, override in self._overrides.items() if room_id in configuration.rooms}
         self._applied_periods.clear()
         self._cancel_pending_transition()
         now = dt_util.now()
@@ -64,15 +68,20 @@ class ScheduleRuntime:
         """Apply only rooms whose active period changed since this runtime started."""
         for room in self._configuration.rooms.values():
             active = active_period_at(room, now)
-            if active is None:
+            override = self._overrides.get(room.id)
+            if override is not None and override.expires_at <= now:
+                self._overrides.pop(room.id)
+                override = None
+            if active is None and override is None:
                 continue
-            key = (active.starts_at, active.period.id)
+            key = (override.expires_at, f"override:{override.temperature}") if override else (active.starts_at, active.period.id)
             if self._applied_periods.get(room.id) == key:
                 continue
-            if await self._async_apply_period(room, active):
+            temperature = override.temperature if override else active.period.temperature
+            if await self._async_apply_temperature(room, temperature):
                 self._applied_periods[room.id] = key
 
-    async def _async_apply_period(self, room: RoomSchedule, active: ScheduledPeriod) -> bool:
+    async def _async_apply_temperature(self, room: RoomSchedule, temperature: float) -> bool:
         """Call every configured target; never its HVAC internals or underlying TRVs."""
         applied = False
         for entity_id in room.climate_entity_ids:
@@ -84,17 +93,15 @@ class ScheduleRuntime:
                 "set_temperature",
                 {
                     ATTR_ENTITY_ID: entity_id,
-                    ATTR_TEMPERATURE: active.period.temperature,
+                    ATTR_TEMPERATURE: temperature,
                 },
                 blocking=True,
             )
             applied = True
             _LOGGER.debug(
-                "Applied %s (%s) to %s at %s",
-                active.period.name,
-                active.period.temperature,
+                "Applied temporary/effective target %s to %s",
+                temperature,
                 entity_id,
-                active.starts_at.isoformat(),
             )
         return applied
 
@@ -104,9 +111,10 @@ class ScheduleRuntime:
             for room in self._configuration.rooms.values()
             if (transition := next_transition_after(room, now)) is not None
         ]
+        candidates.extend(override for override in self._overrides.values() if override.expires_at > now)
         if not candidates:
             return
-        next_at = min(candidate.starts_at for candidate in candidates)
+        next_at = min(candidate.starts_at if isinstance(candidate, ScheduledPeriod) else candidate.expires_at for candidate in candidates)
         self._cancel_next = event_helper.async_track_point_in_time(
             self._hass, self._handle_transition, next_at
         )
@@ -120,3 +128,35 @@ class ScheduleRuntime:
     async def _async_handle_transition(self, now: datetime) -> None:
         await self._async_apply_active_periods(now)
         self._schedule_next_transition(now)
+
+    async def async_set_temporary_override(self, room_ids: list[str], *, duration: str, value: float, operation: str) -> list[TemporaryOverride]:
+        """Apply a transient batch action without changing persisted schedules."""
+        now = dt_util.now()
+        overrides = create_temporary_overrides(self._configuration, room_ids, now=now, duration=duration, value=value, operation=operation)
+        self._overrides.update({override.room_id: override for override in overrides})
+        self._applied_periods.clear()
+        self._cancel_pending_transition()
+        await self._async_apply_active_periods(now)
+        self._schedule_next_transition(now)
+        return overrides
+
+    async def async_clear_temporary_override(self, room_id: str) -> None:
+        """Cancel one room's hold and restore its current scheduled target."""
+        self._overrides.pop(room_id, None)
+        now = dt_util.now()
+        self._applied_periods.clear()
+        self._cancel_pending_transition()
+        await self._async_apply_active_periods(now)
+        self._schedule_next_transition(now)
+
+    def quick_change_state(self) -> dict[str, object]:
+        """Return current per-space targets and short-lived holds for the UI."""
+        now = dt_util.now()
+        rooms = []
+        for room in self._configuration.rooms.values():
+            active = active_period_at(room, now)
+            override = self._overrides.get(room.id)
+            if override is not None and override.expires_at <= now:
+                override = None
+            rooms.append({"id": room.id, "name": room.name, "scheduled_temperature": active.period.temperature if active else None, "effective_temperature": override.temperature if override else (active.period.temperature if active else None), "next_change_at": next_transition_after(room, now).starts_at.isoformat() if next_transition_after(room, now) else None, "override": override.to_dict() if override else None})
+        return {"rooms": rooms}
