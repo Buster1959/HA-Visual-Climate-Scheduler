@@ -4,6 +4,8 @@
 
 - A current, safety-first **Instructions for Use** page in the GitHub Wiki,
   with a matching versioned copy in the repository. The README links to it.
+- A local transparent integration icon in the Home Assistant-supported 256px
+  and 512px PNG formats: calendar, clock and heat flame.
 - **Modify a room or zone** in the integration Configure menu. It retains the
   room's stable identity and all saved daily schedules while allowing its name,
   optional Area and thermostat list to be changed.

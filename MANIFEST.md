@@ -6,6 +6,8 @@ Snapshot: 0.11.0-dev
 ## Added
 - `release_notes/RELEASE_NOTES_0.11.0-dev.md` — Block 7 release notes
 - `docs/INSTRUCTIONS_FOR_USE.md` — versioned pre-release user guide
+- `custom_components/visual_climate_scheduler/brand/icon.png` — 256px transparent integration icon
+- `custom_components/visual_climate_scheduler/brand/icon@2x.png` — 512px high-density integration icon
 
 ## Modified
 - `MANIFEST.md`

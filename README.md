@@ -8,6 +8,9 @@ Read the [Instructions for Use](https://github.com/Buster1959/HA-Visual-Climate-
 before installing. They cover safe test setup, room/zone configuration, the
 sidebar editor and the current limitations for this checkpoint.
 
+The integration includes its own Home Assistant brand icon for current Home
+Assistant releases.
+
 ## Checkpoint 0.11.0-dev
 
 **Block 7 — Room Management & Day Apply**

@@ -23,6 +23,9 @@ people happy to test an unfinished integration in a non-critical room or zone.
    **Visual Climate Scheduler**, and add it. The initial integration setup is
    intentionally empty.
 
+On Home Assistant 2026.3 or newer, the integration card should show the
+calendar, clock and heat icon included with this release after the restart.
+
 ## Configure rooms or zones
 
 Go to **Settings → Devices & services → Visual Climate Scheduler → Configure**.
