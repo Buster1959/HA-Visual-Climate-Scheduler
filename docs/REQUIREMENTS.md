@@ -2,7 +2,7 @@
 
 ## V1
 - Discover climate entities associated with Home Assistant Areas.
-- Configure a room/area and target climate entity.
+- Configure a named room or zone with one or more target climate entities.
 - Store seven independent daily schedules.
 - Initial UI supports up to four periods per day.
 - Each period has stable ID, friendly_name, user-facing name, time and temperature.
@@ -14,7 +14,7 @@
 - Individual days can always be edited afterwards.
 - Visual timeline shows temperature transitions and current time.
 - Startup reconciliation calculates the active period and restores the scheduled target.
-- Missing climate entities do not destroy schedules.
+- Missing or temporarily unavailable climate entities do not destroy schedules or other targets in the same space.
 - Temporary overrides do not modify the programmed schedule.
 - Mobile offers 2 hour, 4 hour and next scheduled change holds.
 - Mobile permanent changes affect only the current active period and can be scoped to today, weekdays, weekend or all days.

@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.8.0-dev
-Phase: Block 4 — V1 Deterministic Schedule Engine
-Status: Core active-period resolution and runtime transition scheduling implemented
+Project version: 0.9.0-dev
+Phase: Block 5 — Room & Zone Setup
+Status: Named scheduled spaces with one-to-many climate targets can be configured and persisted
 
 ## Session checkpoint
 
@@ -30,15 +30,17 @@ Completed:
 - Standing principle "Simple underneath, friendly on top" recorded
 - Deterministic active-period calculation added, including overnight and empty-day carry-over
 - Home Assistant runtime adapter applies startup targets and schedules the nearest transition
+- Options-flow setup for named rooms/zones and one or many climate targets added
+- V1 persisted data migrated from singular to plural climate target IDs
 
 Key decisions:
-- D-001 through D-040 are captured in DECISIONS.md
+- D-001 through D-042 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 
 Next session:
-- Add area/climate discovery and room configuration
 - Connect the existing UI acceptance criteria to production UI work
+- Add the visual schedule editor for the configured rooms and zones
 - Add temporary overrides as a separate layer over the deterministic engine
 
 ## Repository workflow

@@ -14,7 +14,7 @@ Visual Climate Scheduler
       +--> Mobile quick-control
       |
       v
-HA climate entity
+One or more HA climate entities
       |
       v
 Underlying HVAC system
@@ -43,7 +43,8 @@ schedule type, alter stored rooms or execute schedules.
 ## Schedule execution
 
 The V1 engine is deterministic. At integration startup it resolves each room's
-latest period and applies its target to that room's configured climate entity.
+or zone's latest period and applies its target to every configured climate
+entity in that scheduled space.
 It then schedules only the nearest future transition. If a day is empty, the
 most recent period from an earlier populated day remains active; no setpoint is
 invented. Active-period tracking and timer handles are runtime-only.

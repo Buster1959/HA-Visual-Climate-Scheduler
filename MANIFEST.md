@@ -1,34 +1,42 @@
 # Session Manifest
 
 Project: HA Visual Climate Scheduler
-Snapshot: 0.8.0-dev
+Snapshot: 0.9.0-dev
 
 ## Added
-- `custom_components/visual_climate_scheduler/engine.py` — pure active-period and transition calculation
-- `custom_components/visual_climate_scheduler/runtime.py` — HA timer and climate-service adapter
-- `tests/test_engine.py` — deterministic schedule-engine tests
-- `release_notes/RELEASE_NOTES_0.8.0-dev.md` — Block 4 release notes
+- `custom_components/visual_climate_scheduler/rooms.py` — scheduled space configuration helpers
+- `tests/test_rooms.py` — multi-target room and zone tests
+- `release_notes/RELEASE_NOTES_0.9.0-dev.md` — Block 5 release notes
 
 ## Modified
 - `MANIFEST.md`
 - `README.md`
-- `custom_components/visual_climate_scheduler/__init__.py` — engine lifecycle wiring
+- `custom_components/visual_climate_scheduler/config_flow.py` — add/remove room and zone setup
+- `custom_components/visual_climate_scheduler/const.py`
 - `custom_components/visual_climate_scheduler/manifest.json`
+- `custom_components/visual_climate_scheduler/models.py` — schema-v2 multi-target migration
+- `custom_components/visual_climate_scheduler/runtime.py` — applies each active period to all targets
+- `custom_components/visual_climate_scheduler/strings.json`
+- `custom_components/visual_climate_scheduler/translations/en.json`
+- `docs/DATA_MODEL.md`
 - `docs/ARCHITECTURE.md`
 - `docs/DECISIONS.md`
+- `docs/PROJECT.md`
 - `docs/PROJECT_MANIFEST.md`
+- `docs/REQUIREMENTS.md`
+- `tests/test_engine.py`
+- `tests/test_models.py`
 
 ## Deleted
 None.
 
 ## Production code
-Deterministic schedule engine and its runtime boundary only. No room discovery,
-room-configuration UI, overrides or frontend schedule editor is included.
+Room and zone setup plus its data-model/runtime boundary. No visual period editor,
+overrides or learning is included.
 
 ## Recommended Git commit
-`feat: add Block 4 deterministic schedule engine`
+`feat: add Block 5 multi-thermostat room and zone setup`
 
 ## Next
-- Area and climate-entity discovery/configuration
-- Room schedule editing UI
+- Visual schedule editor for configured rooms and zones
 - Temporary override layer

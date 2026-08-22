@@ -3,11 +3,46 @@
     "step": {
       "user": {
         "title": "Set up Visual Climate Scheduler",
-        "description": "Create the scheduler. Rooms and climate entities are configured in the next V1 block."
+        "description": "Create the scheduler. Configure rooms and zones from the integration's Configure button."
       }
     },
     "abort": {
       "already_configured": "Visual Climate Scheduler is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "menu_options": {
+          "add_scheduled_space": "Add a room or zone",
+          "remove_scheduled_space": "Remove a room or zone"
+        }
+      },
+      "add_scheduled_space": {
+        "title": "Add room or zone",
+        "description": "Select every climate thermostat that should receive the same schedule.",
+        "data": {
+          "room_name": "Room or zone name",
+          "area_id": "Home Assistant Area (optional)",
+          "climate_entity_ids": "Climate thermostats"
+        }
+      },
+      "remove_scheduled_space": {
+        "title": "Remove room or zone",
+        "data": {
+          "room_id": "Room or zone"
+        }
+      }
+    },
+    "error": {
+      "invalid_name": "Enter a room or zone name.",
+      "no_climate_entities": "Select at least one climate thermostat.",
+      "unknown_area": "The selected Area no longer exists.",
+      "unknown_climate_entity": "One or more selected climate entities no longer exist.",
+      "duplicate_climate_entity": "A selected climate thermostat already belongs to another scheduled space."
+    },
+    "abort": {
+      "no_scheduled_spaces": "There are no configured rooms or zones to remove."
     }
   }
 }

@@ -21,7 +21,7 @@ def room(days: dict[str, tuple[SchedulePeriod, ...]]) -> RoomSchedule:
         id="living_room",
         name="Living Room",
         area_id="living_room",
-        climate_entity_id="climate.living_room",
+        climate_entity_ids=("climate.living_room",),
         days={day: days.get(day, ()) for day in WEEKDAYS},
     )
 

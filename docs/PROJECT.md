@@ -22,6 +22,13 @@ V2 adds optional learning from repeated user behaviour. Learning initially produ
 ## Key differentiator
 Seven daily schedules are stored independently. Weekdays, Weekend and All Days are dynamic UI groupings/actions rather than permanent schedule objects. This allows a day to diverge naturally without a "break schedule" operation.
 
+## Scheduled spaces
+A scheduled space is a named room or zone with one or more climate targets. A
+single thermostat is simply a space with one target; multiple lounge thermostats
+or every thermostat in a hotel zone use the same model and receive the same
+scheduled setpoint. The system must not create separate room and zone schedule
+types.
+
 ## Target interfaces
 PC/tablet: full visual timeline/editor.
 

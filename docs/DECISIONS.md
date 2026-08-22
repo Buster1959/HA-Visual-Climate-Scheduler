@@ -38,5 +38,7 @@
 - **D-036** — Simple underneath, friendly on top: use the simplest persistent model that supports V1. UI shortcuts such as Weekdays, Weekend and All Days must not become stored schedule types.
 - **D-037** — Schema migration is owned by the Home Assistant-independent model boundary. A missing legacy version is migrated to schema version 1; future versions fail safely until an explicit migration is supplied.
 - **D-038** — A schedule copy creates detached daily period collections while retaining period IDs as stable logical identities.
-- **D-039** — The V1 engine resolves the most recent period at startup and schedules the nearest future transition. It calls only the configured HA climate entity with `climate.set_temperature`.
+- **D-039** — The V1 engine resolves the most recent period at startup and schedules the nearest future transition. It calls only the configured HA climate entities with `climate.set_temperature`.
 - **D-040** — A period remains active across midnight and across empty days until a later persisted period occurs. Active-period bookkeeping and timer callbacks are runtime state, never persisted configuration.
+- **D-041** — A scheduled space is one named room or zone with a non-empty list of climate targets. One and many targets use the same model; a schedule period applies its setpoint to every target.
+- **D-042** — A climate target may belong to only one scheduled space, preventing conflicting schedules. Area context is optional navigation metadata because a zone may span several Areas.

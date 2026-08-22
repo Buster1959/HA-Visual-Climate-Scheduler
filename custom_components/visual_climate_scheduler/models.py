@@ -13,7 +13,7 @@ import math
 import re
 from typing import Any, Iterable, Mapping
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 WEEKDAYS = (
     "monday",
     "tuesday",
@@ -123,23 +123,32 @@ def copy_periods(periods: Iterable[SchedulePeriod]) -> tuple[SchedulePeriod, ...
 
 @dataclass(frozen=True, slots=True)
 class RoomSchedule:
-    """Persisted schedule and HA references for one configured room."""
+    """Persisted schedule and HA targets for one scheduled room or zone."""
 
     id: str
     name: str
-    area_id: str
-    climate_entity_id: str
+    area_id: str | None
+    climate_entity_ids: Iterable[str]
     days: Mapping[str, Iterable[SchedulePeriod]]
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "id", _require_string(self.id, "room.id"))
         object.__setattr__(self, "name", _require_string(self.name, "room.name"))
-        object.__setattr__(self, "area_id", _require_string(self.area_id, "room.area_id"))
-        object.__setattr__(
-            self,
-            "climate_entity_id",
-            _require_string(self.climate_entity_id, "room.climate_entity_id"),
+        if self.area_id is not None:
+            object.__setattr__(self, "area_id", _require_string(self.area_id, "room.area_id"))
+        if isinstance(self.climate_entity_ids, str):
+            raise ValueError("room.climate_entity_ids must be a list of climate entity IDs")
+        targets = tuple(
+            _require_string(entity_id, "room.climate_entity_ids")
+            for entity_id in self.climate_entity_ids
         )
+        if not targets:
+            raise ValueError("room.climate_entity_ids must contain at least one climate entity")
+        if len(set(targets)) != len(targets):
+            raise ValueError("room.climate_entity_ids contains duplicate climate entities")
+        if any(not entity_id.startswith("climate.") for entity_id in targets):
+            raise ValueError("room.climate_entity_ids must contain climate entity IDs")
+        object.__setattr__(self, "climate_entity_ids", targets)
         if set(self.days) != set(WEEKDAYS):
             raise ValueError("room.days must contain exactly monday through sunday")
         object.__setattr__(
@@ -155,6 +164,9 @@ class RoomSchedule:
         raw_days = value.get("days")
         if not isinstance(raw_days, Mapping):
             raise ValueError("room.days must be an object")
+        raw_targets = value.get("climate_entity_ids")
+        if not isinstance(raw_targets, list):
+            raise ValueError("room.climate_entity_ids must be a list")
         days: dict[str, tuple[SchedulePeriod, ...]] = {}
         for day, raw_periods in raw_days.items():
             if not isinstance(raw_periods, list):
@@ -164,7 +176,7 @@ class RoomSchedule:
             id=value.get("id"),
             name=value.get("name"),
             area_id=value.get("area_id"),
-            climate_entity_id=value.get("climate_entity_id"),
+            climate_entity_ids=raw_targets,
             days=days,
         )
 
@@ -186,7 +198,7 @@ class RoomSchedule:
             id=self.id,
             name=self.name,
             area_id=self.area_id,
-            climate_entity_id=self.climate_entity_id,
+            climate_entity_ids=self.climate_entity_ids,
             days=days,
         )
 
@@ -195,7 +207,7 @@ class RoomSchedule:
             "id": self.id,
             "name": self.name,
             "area_id": self.area_id,
-            "climate_entity_id": self.climate_entity_id,
+            "climate_entity_ids": list(self.climate_entity_ids),
             "days": {
                 day: [period.to_dict() for period in self.days[day]] for day in WEEKDAYS
             },
@@ -230,8 +242,10 @@ class ScheduleConfiguration:
     def migrate_dict(value: Mapping[str, Any]) -> dict[str, Any]:
         """Migrate a stored document to the current schema.
 
-        Version 0 was the pre-versioned prototype shape. Its fields already match
-        V1, so migration makes version 1 explicit. Future migrations belong here.
+        Version 0 was the pre-versioned prototype shape. Version 1 used a single
+        ``climate_entity_id`` per scheduled space. Version 2 stores a non-empty
+        ``climate_entity_ids`` list, allowing a room or zone to set several
+        thermostats without adding a second schedule type.
         """
         if not isinstance(value, Mapping):
             raise ValueError("schedule configuration must be an object")
@@ -239,12 +253,28 @@ class ScheduleConfiguration:
         version = migrated.get("version", 0)
         if isinstance(version, bool) or not isinstance(version, int):
             raise ValueError("schedule configuration version must be an integer")
-        if version == 0:
-            migrated["version"] = SCHEMA_VERSION
-            return migrated
-        if version == SCHEMA_VERSION:
-            return migrated
-        raise ValueError(f"unsupported schedule configuration version: {version}")
+        while version < SCHEMA_VERSION:
+            if version == 0:
+                version = 1
+                migrated["version"] = version
+                continue
+            if version == 1:
+                rooms = migrated.get("rooms", {})
+                if not isinstance(rooms, dict):
+                    raise ValueError("configuration.rooms must be an object")
+                for room in rooms.values():
+                    if not isinstance(room, dict):
+                        raise ValueError("room must be an object")
+                    entity_id = room.pop("climate_entity_id", None)
+                    if "climate_entity_ids" not in room:
+                        room["climate_entity_ids"] = [entity_id] if entity_id is not None else []
+                version = 2
+                migrated["version"] = version
+                continue
+            raise ValueError(f"unsupported schedule configuration version: {version}")
+        if version != SCHEMA_VERSION:
+            raise ValueError(f"unsupported schedule configuration version: {version}")
+        return migrated
 
     @classmethod
     def from_dict(cls, value: Mapping[str, Any]) -> "ScheduleConfiguration":

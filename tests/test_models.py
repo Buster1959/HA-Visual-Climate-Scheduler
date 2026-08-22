@@ -25,7 +25,7 @@ def room(days: dict[str, tuple[SchedulePeriod, ...]] | None = None) -> RoomSched
         id="living_room",
         name="Living Room",
         area_id="living_room",
-        climate_entity_id="climate.living_room",
+        climate_entity_ids=("climate.living_room",),
         days=days or {day: () for day in WEEKDAYS},
     )
 
@@ -46,7 +46,7 @@ class ScheduleModelTests(unittest.TestCase):
 
         self.assertEqual(restored, original)
         self.assertEqual(restored.rooms["living_room"].days["monday"][0].time, "06:30")
-        self.assertIn('"version": 1', stored_json)
+        self.assertIn(f'"version": {SCHEMA_VERSION}', stored_json)
 
     def test_seven_days_are_required_and_independent(self) -> None:
         with self.assertRaisesRegex(ValueError, "exactly monday through sunday"):
@@ -90,12 +90,43 @@ class ScheduleModelTests(unittest.TestCase):
         self.assertIsNot(standalone_copy[0], source[0])
         self.assertEqual(copied.days["thursday"], ())
 
-    def test_version_zero_migrates_and_future_version_fails(self) -> None:
+    def test_legacy_single_target_migrates_and_future_version_fails(self) -> None:
         migrated = ScheduleConfiguration.from_dict({"rooms": {}, "settings": {}})
         self.assertEqual(migrated.version, SCHEMA_VERSION)
         self.assertEqual(migrated.to_dict()["version"], SCHEMA_VERSION)
+        legacy = ScheduleConfiguration.from_dict(
+            {
+                "version": 1,
+                "rooms": {
+                    "living_room": {
+                        "id": "living_room",
+                        "name": "Living Room",
+                        "area_id": "living_room",
+                        "climate_entity_id": "climate.living_room",
+                        "days": {day: [] for day in WEEKDAYS},
+                    }
+                },
+                "settings": {},
+            }
+        )
+        self.assertEqual(legacy.rooms["living_room"].climate_entity_ids, ("climate.living_room",))
         with self.assertRaisesRegex(ValueError, "unsupported"):
-            ScheduleConfiguration.from_dict({"version": 2, "rooms": {}, "settings": {}})
+            ScheduleConfiguration.from_dict({"version": 3, "rooms": {}, "settings": {}})
+
+    def test_room_can_target_multiple_thermostats(self) -> None:
+        lounge = RoomSchedule(
+            id="lounge",
+            name="Lounge",
+            area_id="lounge",
+            climate_entity_ids=(
+                "climate.lounge_radiator_1",
+                "climate.lounge_radiator_2",
+                "climate.lounge_radiator_3",
+            ),
+            days={day: () for day in WEEKDAYS},
+        )
+        self.assertEqual(len(lounge.climate_entity_ids), 3)
+        self.assertEqual(lounge.to_dict()["climate_entity_ids"][2], "climate.lounge_radiator_3")
 
 
 class FakeStore:

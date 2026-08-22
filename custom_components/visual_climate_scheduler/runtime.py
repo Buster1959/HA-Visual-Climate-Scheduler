@@ -73,32 +73,30 @@ class ScheduleRuntime:
                 self._applied_periods[room.id] = key
 
     async def _async_apply_period(self, room: RoomSchedule, active: ScheduledPeriod) -> bool:
-        """Call only the room's configured climate entity; never its HVAC internals."""
-        entity_id = room.climate_entity_id
-        if not entity_id.startswith("climate."):
-            _LOGGER.warning("Skipping non-climate scheduler target for room %s: %s", room.id, entity_id)
-            return False
-        if self._hass.states.get(entity_id) is None:
-            _LOGGER.warning("Scheduler target is unavailable for room %s: %s", room.id, entity_id)
-            return False
-
-        await self._hass.services.async_call(
-            CLIMATE_DOMAIN,
-            "set_temperature",
-            {
-                ATTR_ENTITY_ID: entity_id,
-                ATTR_TEMPERATURE: active.period.temperature,
-            },
-            blocking=True,
-        )
-        _LOGGER.debug(
-            "Applied %s (%s) to %s at %s",
-            active.period.name,
-            active.period.temperature,
-            entity_id,
-            active.starts_at.isoformat(),
-        )
-        return True
+        """Call every configured target; never its HVAC internals or underlying TRVs."""
+        applied = False
+        for entity_id in room.climate_entity_ids:
+            if self._hass.states.get(entity_id) is None:
+                _LOGGER.warning("Scheduler target is unavailable for room %s: %s", room.id, entity_id)
+                continue
+            await self._hass.services.async_call(
+                CLIMATE_DOMAIN,
+                "set_temperature",
+                {
+                    ATTR_ENTITY_ID: entity_id,
+                    ATTR_TEMPERATURE: active.period.temperature,
+                },
+                blocking=True,
+            )
+            applied = True
+            _LOGGER.debug(
+                "Applied %s (%s) to %s at %s",
+                active.period.name,
+                active.period.temperature,
+                entity_id,
+                active.starts_at.isoformat(),
+            )
+        return applied
 
     def _schedule_next_transition(self, now: datetime) -> None:
         candidates = [
