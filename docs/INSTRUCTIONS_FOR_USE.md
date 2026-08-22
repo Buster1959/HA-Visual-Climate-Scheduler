@@ -1,4 +1,4 @@
-# Instructions for Use — Pre-release 0.16.0-dev
+# Instructions for Use — Pre-release 0.16.1-dev
 
 This guide describes the implemented Block 12 pre-release. It is suitable for
 people happy to test an unfinished integration in a non-critical room or zone.
@@ -101,5 +101,5 @@ Assistant restarts.
 ## Reporting feedback
 
 When reporting a problem, include your Home Assistant version, the integration
-version (`0.16.0-dev`), the affected room/zone and the exact steps that led to
+version (`0.16.1-dev`), the affected room/zone and the exact steps that led to
 the result. Do not include secrets or full Home Assistant backups.

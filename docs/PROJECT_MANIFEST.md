@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.16.0-dev
+Project version: 0.16.1-dev
 Phase: Block 12 — Open Scheduler from the Integration
-Status: The full admin-only scheduler is available from the integration's Configure action, with a separately optional sidebar shortcut
+Status: The full admin-only scheduler is available from the integration's Configure action, with a separately optional sidebar shortcut and versioned panel assets
 
 ## Session checkpoint
 
@@ -46,6 +46,7 @@ Completed:
 - A completed schedule can be copied to selected rooms/zones; only their daily schedules are replaced
 - Schedule storage records `°C` or `°F` at initial setup and rejects a changed HA unit rather than silently applying misleading targets
 - The scheduler is registered as the integration configuration panel and remains directly available when the optional sidebar shortcut is hidden
+- Bundled panel assets use a versioned URL so an integration update does not reuse a stale browser-cached editor
 
 Key decisions:
 - D-001 through D-054 are captured in DECISIONS.md

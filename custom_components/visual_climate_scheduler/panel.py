@@ -9,7 +9,13 @@ from homeassistant.components.frontend import async_panel_exists
 from homeassistant.components.http import StaticPathConfig
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, PANEL_COMPONENT, PANEL_STATIC_URL, PANEL_URL_PATH
+from .const import (
+    DOMAIN,
+    PANEL_ASSET_VERSION,
+    PANEL_COMPONENT,
+    PANEL_STATIC_URL,
+    PANEL_URL_PATH,
+)
 
 _STATIC_REGISTERED = f"{DOMAIN}_panel_static_registered"
 
@@ -34,7 +40,10 @@ async def async_sync_panel(hass: HomeAssistant, visible: bool) -> None:
         hass=hass,
         frontend_url_path=PANEL_URL_PATH,
         webcomponent_name=PANEL_COMPONENT,
-        module_url=f"{PANEL_STATIC_URL}/visual-climate-scheduler-panel.js",
+        module_url=(
+            f"{PANEL_STATIC_URL}/visual-climate-scheduler-panel.js"
+            f"?v={PANEL_ASSET_VERSION}"
+        ),
         sidebar_title="Climate Scheduler" if visible else None,
         sidebar_icon="mdi:calendar-clock" if visible else None,
         require_admin=True,
