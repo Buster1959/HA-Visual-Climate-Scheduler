@@ -1,0 +1,13 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Visual Climate Scheduler",
+        "description": "Create the scheduler. Rooms and climate entities are configured in the next V1 block."
+      }
+    },
+    "abort": {
+      "already_configured": "Visual Climate Scheduler is already configured."
+    }
+  }
+}

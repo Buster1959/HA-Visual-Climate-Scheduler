@@ -9,6 +9,7 @@ Visual Climate Scheduler
       +--> Persistent configuration (HA Store / JSON-serialisable)
       +--> Schedule engine
       +--> Runtime state / overrides
+      +--> Optional ZEAL discovery context
       +--> PC/tablet visual editor
       +--> Mobile quick-control
       |
@@ -23,6 +24,12 @@ The scheduler does not control heat pumps, boilers, pumps or HVAC plant.
 
 ## Persistence
 Use Home Assistant's Store helper for versioned JSON-serialisable persistent configuration. Runtime state is kept separately and is not part of the persistent schedule model.
+
+## Optional ZEAL discovery
+When ZEAL is installed, the integration can discover ZEAL's canonical room
+thermostat entities through Home Assistant's public boundaries. Discovery is
+runtime-only and provides preferred Zone navigation context. It does not add a
+schedule type, alter stored rooms or execute schedules.
 
 ## Data principles
 - Human-readable

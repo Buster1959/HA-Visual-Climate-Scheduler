@@ -6,6 +6,13 @@ Create a standalone Home Assistant integration providing a modern, visual, room-
 ## Product principle
 Optimise for real-world Home Assistant users rather than implementation convenience.
 
+## Standing design principle
+**Simple underneath, friendly on top.** Use the simplest underlying model that
+supports the required behaviour. The UI may offer convenient shortcuts and rich
+visualisation, but must not introduce unnecessary concepts into the architecture.
+Raise a materially simpler approach when it improves maintainability,
+reliability or user experience; do not turn equivalent alternatives into debate.
+
 ## V1
 V1 is a deterministic scheduler. It controls Home Assistant climate entity setpoints and has no dependency on the Heat Control System.
 

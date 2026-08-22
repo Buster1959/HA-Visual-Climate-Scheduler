@@ -1,12 +1,13 @@
 # HA Visual Climate Scheduler
 
-A modern Home Assistant climate scheduler inspired by the useful parts of Fibaro Climate Control, redesigned around independent daily schedules, visual editing, and real-world usability.
+A modern Home Assistant climate scheduler built around independent daily schedules, visual editing, and real-world usability.
 
-## Release 0.1.0
+## Checkpoint 0.7.0-dev
 
-**Project Definition & Architecture Baseline**
+**Block 3 — V1 Schedule Data Model & Persistence Boundary**
 
-This is a design/documentation milestone. Production integration code has not yet been started.
+The versioned, human-readable schedule model and Home Assistant Store adapter
+are implemented. Schedule execution has not been started.
 
 ## V1
 - Visual PC/tablet timeline editor

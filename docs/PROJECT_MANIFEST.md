@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.2.0-dev
-Phase: Project Definition & Architecture Baseline
-Status: Design phase — implementation not started
+Project version: 0.7.0-dev
+Phase: Block 3 — V1 Schedule Data Model & Persistence Boundary
+Status: Versioned schedule persistence boundary complete; scheduler behaviour not yet implemented
 
 ## Session checkpoint
 
@@ -21,19 +21,23 @@ Completed:
 - V1 independence from the Heat Control System confirmed
 - Approved visual UI mockup added as `ui_mockup/index.html` baseline
 - UI interaction prototype and human-facing acceptance tests added
+- Home Assistant config-entry scaffold added
+- Versioned JSON schedule-model and HA Store boundary added
+- Strict exact-minute validation, daily conflict validation and safe schema migration added
+- Explicit schedule-copy semantics added: days are detached; stable period IDs are retained
+- ZEAL discovery decisions retained as optional navigation context only
+- Block 2 ZEAL discovery, diagnostics and explicit thermostat-only test action retained
+- Standing principle "Simple underneath, friendly on top" recorded
 
 Key decisions:
-- D-001 through D-026 are captured in DECISIONS.md
+- D-001 through D-038 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 
 Next session:
-- Finalise detailed JSON schema
-- Design Room Overview
-- Design PC/tablet timeline interactions
-- Design mobile quick-control flow
-- Define V1 acceptance tests
-- Then begin implementation
+- Add area/climate discovery and room configuration
+- Implement the schedule engine against the persisted model
+- Connect the existing UI acceptance criteria to production UI work
 
 ## Repository workflow
 

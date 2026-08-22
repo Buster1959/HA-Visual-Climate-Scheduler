@@ -33,3 +33,8 @@
 - **D-031** — In the UI, ZEAL Zone is the preferred top-level navigation when ZEAL is installed; Floor and Room selectors cascade from the selected Zone.
 - **D-032** — The visual mockup must be a functional local UX prototype: schedule edits, time/setpoint changes, weekday breaking and weekday application must visibly update local state before production HA integration work begins.
 - **D-033** — The schedule timeline shall display a temperature scale on the left and support both precise numeric editing and direct vertical point manipulation.
+- **D-034** — The first V1 production boundary is a standard Home Assistant config-entry integration. Its persisted schedule model is Home Assistant-runtime-independent, versioned and JSON-serialisable; Home Assistant Store is accessed only through a dedicated adapter.
+- **D-035** — Each config entry owns one schedule configuration containing rooms keyed by stable room ID, their area/climate references, and exactly seven independent daily period lists. Runtime state, overrides and learning data remain outside this configuration.
+- **D-036** — Simple underneath, friendly on top: use the simplest persistent model that supports V1. UI shortcuts such as Weekdays, Weekend and All Days must not become stored schedule types.
+- **D-037** — Schema migration is owned by the Home Assistant-independent model boundary. A missing legacy version is migrated to schema version 1; future versions fail safely until an explicit migration is supplied.
+- **D-038** — A schedule copy creates detached daily period collections while retaining period IDs as stable logical identities.

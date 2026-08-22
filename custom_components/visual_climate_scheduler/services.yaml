@@ -1,0 +1,23 @@
+set_zeal_room_temperature:
+  name: Set ZEAL room temperature
+  description: >-
+    Explicit Block 2 test action. Resolves a discovered ZEAL room thermostat and
+    calls climate.set_temperature only for that ZEAL thermostat entity.
+  fields:
+    entity_id:
+      name: ZEAL room thermostat
+      description: A discovered ZEAL room thermostat; underlying TRVs are rejected.
+      required: true
+      selector:
+        entity:
+          domain: climate
+    temperature:
+      name: Target temperature
+      description: Requested temperature in degrees Celsius.
+      required: true
+      selector:
+        number:
+          min: 5
+          max: 35
+          step: 0.1
+          unit_of_measurement: "°C"
