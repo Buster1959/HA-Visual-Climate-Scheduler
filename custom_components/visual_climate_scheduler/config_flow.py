@@ -224,7 +224,7 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
     async def async_step_panel_settings(
         self, user_input: dict[str, Any] | None = None
     ) -> config_entries.ConfigFlowResult:
-        """Let the user show or hide the full schedule editor in the sidebar."""
+        """Let the user show or hide the scheduler shortcut in the sidebar."""
         entry_data = self.hass.data[DOMAIN][self.config_entry.entry_id]
         configuration = entry_data["configuration"]
         if user_input is not None:

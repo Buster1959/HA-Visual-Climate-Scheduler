@@ -58,7 +58,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if not hass.data[DOMAIN]:
         hass.data.pop(DOMAIN)
         hass.services.async_remove(DOMAIN, "set_zeal_room_temperature")
-        from .panel import async_sync_panel
+        from .panel import async_remove_panel
 
-        await async_sync_panel(hass, False)
+        await async_remove_panel(hass)
     return True

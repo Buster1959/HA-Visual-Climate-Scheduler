@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.15.0-dev
-Phase: Block 11 — V1 Temperature-Unit Safety
-Status: Schedule document records Home Assistant's initial temperature unit and safely blocks a changed unit until the integration is reset
+Project version: 0.16.0-dev
+Phase: Block 12 — Open Scheduler from the Integration
+Status: The full admin-only scheduler is available from the integration's Configure action, with a separately optional sidebar shortcut
 
 ## Session checkpoint
 
@@ -32,7 +32,7 @@ Completed:
 - Home Assistant runtime adapter applies startup targets and schedules the nearest transition
 - Options-flow setup for named rooms/zones and one or many climate targets added
 - V1 persisted data migrated from singular to plural climate target IDs
-- Optional admin-only sidebar editor can be enabled from the integration's Configure menu
+- The full admin-only scheduler opens from the integration's Configure action; its sidebar shortcut is optional
 - Editor changes are validated by the durable data model, persisted through HA Store and applied to the running engine
 - First editor supports direct period name, exact time and temperature editing for seven independent days
 - Sidebar visibility is a persisted preference and never changes saved schedules
@@ -45,9 +45,10 @@ Completed:
 - Quick Change applies cancellable temporary holds without modifying saved schedules
 - A completed schedule can be copied to selected rooms/zones; only their daily schedules are replaced
 - Schedule storage records `°C` or `°F` at initial setup and rejects a changed HA unit rather than silently applying misleading targets
+- The scheduler is registered as the integration configuration panel and remains directly available when the optional sidebar shortcut is hidden
 
 Key decisions:
-- D-001 through D-053 are captured in DECISIONS.md
+- D-001 through D-054 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 

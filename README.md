@@ -6,27 +6,30 @@ A modern Home Assistant climate scheduler built around independent daily schedul
 
 Read the [Instructions for Use](https://github.com/Buster1959/HA-Visual-Climate-Scheduler/wiki/Instructions-for-Use)
 before installing. They cover safe test setup, room/zone configuration, the
-sidebar editor and the current limitations for this checkpoint.
+direct scheduler launch, the optional sidebar shortcut and the current
+limitations for this checkpoint.
 
 The integration includes its own Home Assistant brand icon for current Home
 Assistant releases.
 
-## Checkpoint 0.15.0-dev
+## Checkpoint 0.16.0-dev
 
-**Block 11 — V1 Temperature-Unit Safety**
+**Block 12 — Open Scheduler from the Integration**
 
-The scheduler now has an optional, admin-only sidebar editor. In the
-integration's Configure menu, choose **Sidebar editor** and tick **Show
-scheduler editor in sidebar**. The panel presents seven independent daily
+Open the full, admin-only scheduler from **Settings → Devices & services →
+Visual Climate Scheduler → Configure**, without adding anything to the
+sidebar. The same full editor can still be exposed as an optional sidebar
+shortcut from **Rooms and zones**. The panel presents seven independent daily
 schedules for each configured room or zone, with exact time and temperature
 editing, up to four periods per day in this first UI.
 
-The integration Configure menu remains the place to add/remove rooms and
-zones. Choose **Modify a room or zone** to change its details or add/remove
-thermostats while keeping its daily schedules. The sidebar is the day-to-day
-schedule editor: choose a source day, tick **Apply here** on destination days,
-then choose **Apply to selected days** and Save. Hiding the sidebar checkbox
-removes the navigation item without deleting schedules.
+Open **Rooms and zones** in the scheduler to add, modify or remove rooms and
+zones. Modify keeps the stable room and its daily schedules, so it is the place
+to add or remove thermostats. The scheduler is the day-to-day editor: choose a
+source day, tick **Apply here** on destination days, then choose **Apply to
+selected days** and Save. Hiding the sidebar checkbox removes only the optional
+navigation shortcut; the direct integration launch and saved schedules remain
+available.
 
 Every day card now has a visual temperature timeline. Drag a point left/right
 to move its time (15-minute steps) or up/down to change its target (0.5°C

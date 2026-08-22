@@ -1,6 +1,6 @@
-# Instructions for Use — Pre-release 0.15.0-dev
+# Instructions for Use — Pre-release 0.16.0-dev
 
-This guide describes the implemented Block 11 pre-release. It is suitable for
+This guide describes the implemented Block 12 pre-release. It is suitable for
 people happy to test an unfinished integration in a non-critical room or zone.
 
 ## Before you begin
@@ -28,12 +28,12 @@ calendar, clock and heat icon included with this release after the restart.
 
 ## Configure rooms or zones
 
-Go to **Settings → Devices & services → Visual Climate Scheduler → Configure**.
+Go to **Settings → Devices & services → Visual Climate Scheduler → Configure**,
+then open **Rooms and zones**.
 
 - **Add a room or zone** creates a named scheduled space. Select every climate
-  thermostat that should receive the same target. Tick **Add another room or
-  zone after saving** when entering several spaces in sequence.
-- **Modify a room or zone** changes its name, optional Area or thermostat list
+  thermostat that should receive the same target.
+- **Modify** changes its name, optional Home Assistant Area or thermostat list
   without losing its existing daily schedule. Use this to add a second or third
   thermostat to a room.
 - A climate thermostat can belong to only one scheduled space. This prevents
@@ -50,26 +50,34 @@ Scheduler** instead, then create schedules in the new unit. This is deliberate
 safety behaviour; it prevents an old value being sent as though it used the new
 unit.
 
-## Enable and use the sidebar editor
+## Open and use the scheduler
 
-1. In Configure, choose **Sidebar editor** and tick **Show scheduler editor in
-   sidebar**.
-2. Open **Climate Scheduler** from the Home Assistant sidebar.
-3. Select the room or zone to edit.
-4. Each day is independent. Add up to four periods in this first UI, set the
+1. Go to **Settings → Devices & services → Visual Climate Scheduler →
+   Configure**. This opens the scheduler directly; it does not require a
+   sidebar item.
+2. Select the room or zone to edit.
+3. Each day is independent. Add up to four periods in this first UI, set the
    period name, exact `HH:MM` start time and target temperature, then choose
    **Save schedule**. Each card also has a visual timeline: drag a point
    left/right for time (15-minute steps), or up/down for target temperature
    (0.5°C steps). Click a point to highlight its precise fields; use those
    fields whenever an exact minute is needed.
-5. To reuse a day: choose its **Source** radio button, tick **Apply here** on
+4. To reuse a day: choose its **Source** radio button, tick **Apply here** on
    one or more destination days, choose **Apply to selected days**, then Save.
    The copied days are independent afterwards.
-6. To copy a complete seven-day schedule to another room or zone, select the
+5. To copy a complete seven-day schedule to another room or zone, select the
    finished source room, expand **Copy schedule to rooms**, tick the destination
    rooms and choose **Copy to selected rooms**. This also saves any current
    source edits. It replaces only each destination's daily schedule; its name,
    Area and selected thermostats are unchanged.
+
+### Optional sidebar shortcut
+
+If you prefer a permanent navigation item, open **Rooms and zones** and tick
+**Show Climate Scheduler in the sidebar**. This only adds the **Climate
+Scheduler** sidebar shortcut; it does not create a second editor or change any
+schedules. Unticking it removes that shortcut but the direct **Configure**
+launch remains available.
 
 ## Quick Change
 
@@ -86,12 +94,12 @@ Assistant restarts.
   editor presents up to four.
 - Duplicate times within a day are rejected. Periods are saved in time order.
 - A temporary hold is not restored after a Home Assistant restart.
-- If the sidebar does not appear, confirm you are an administrator, the
-  checkbox is enabled and refresh the Home Assistant browser page after
-  changing it.
+- If the direct **Configure** launch or optional sidebar shortcut does not
+  appear, confirm you are an administrator and refresh the Home Assistant
+  browser page after changing the setting.
 
 ## Reporting feedback
 
 When reporting a problem, include your Home Assistant version, the integration
-version (`0.15.0-dev`), the affected room/zone and the exact steps that led to
+version (`0.16.0-dev`), the affected room/zone and the exact steps that led to
 the result. Do not include secrets or full Home Assistant backups.

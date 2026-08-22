@@ -53,7 +53,7 @@
       },
       "panel_settings": {
         "title": "Sidebar editor",
-        "description": "Show or hide the visual schedule editor in Home Assistant's sidebar.",
+        "description": "Show or hide the scheduler shortcut in Home Assistant's sidebar. The editor remains available from this integration.",
         "data": {
           "show_panel": "Show scheduler editor in sidebar"
         }

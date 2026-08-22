@@ -8,10 +8,15 @@ import voluptuous as vol
 
 from homeassistant.components import websocket_api
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import area_registry as ar
+from homeassistant.helpers import entity_registry as er
 
 from .configuration import async_save_configuration
-from .const import DOMAIN
+from .const import CONF_SHOW_PANEL, DOMAIN
 from .editor import copy_room_schedule, update_room_days
+from .models import ScheduleConfiguration
+from .panel import async_sync_panel
+from .rooms import add_scheduled_space, remove_scheduled_space, update_scheduled_space
 
 _REGISTERED = f"{DOMAIN}_websocket_registered"
 
@@ -23,6 +28,9 @@ def async_register_commands(hass: HomeAssistant) -> None:
     websocket_api.async_register_command(hass, ws_get_configuration)
     websocket_api.async_register_command(hass, ws_update_room_days)
     websocket_api.async_register_command(hass, ws_copy_room_schedule)
+    websocket_api.async_register_command(hass, ws_save_scheduled_space)
+    websocket_api.async_register_command(hass, ws_remove_scheduled_space)
+    websocket_api.async_register_command(hass, ws_set_sidebar_shortcut)
     websocket_api.async_register_command(hass, ws_get_quick_change)
     websocket_api.async_register_command(hass, ws_set_temporary_override)
     websocket_api.async_register_command(hass, ws_clear_temporary_override)
@@ -46,6 +54,114 @@ def ws_get_configuration(
         return
     _, entry_data = entry
     connection.send_result(msg["id"], entry_data["configuration"].to_dict())
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "visual_climate_scheduler/save_scheduled_space",
+        vol.Optional("room_id"): str,
+        vol.Required("name"): str,
+        vol.Optional("area_id"): vol.Any(str, None),
+        vol.Required("climate_entity_ids"): [str],
+    }
+)
+@websocket_api.async_response
+async def ws_save_scheduled_space(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Create or modify one scheduled space from the integration panel."""
+    if (entry := _entry_data(hass)) is None:
+        connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "Scheduler is not loaded")
+        return
+    entry_id, entry_data = entry
+    name = msg["name"].strip()
+    climate_entity_ids = tuple(msg["climate_entity_ids"])
+    if not name:
+        connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "A room or zone name is required")
+        return
+    if not climate_entity_ids:
+        connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Select at least one climate thermostat")
+        return
+    if any(not entity_id.startswith("climate.") for entity_id in climate_entity_ids):
+        connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Targets must be climate entities")
+        return
+    area_id = msg.get("area_id") or None
+    if area_id is not None and ar.async_get(hass).async_get_area(area_id) is None:
+        connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Unknown Home Assistant Area ID")
+        return
+    entity_registry = er.async_get(hass)
+    if any(entity_registry.async_get(entity_id) is None for entity_id in climate_entity_ids):
+        connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, "Unknown climate thermostat")
+        return
+    try:
+        if room_id := msg.get("room_id"):
+            updated_configuration = update_scheduled_space(
+                entry_data["configuration"], room_id, name=name, area_id=area_id,
+                climate_entity_ids=climate_entity_ids,
+            )
+        else:
+            updated_configuration = add_scheduled_space(
+                entry_data["configuration"], name=name, area_id=area_id,
+                climate_entity_ids=climate_entity_ids,
+            )
+    except ValueError as err:
+        connection.send_error(msg["id"], websocket_api.ERR_INVALID_FORMAT, str(err))
+        return
+    await async_save_configuration(hass, entry_id, updated_configuration)
+    connection.send_result(msg["id"], updated_configuration.to_dict())
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "visual_climate_scheduler/remove_scheduled_space",
+        vol.Required("room_id"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_remove_scheduled_space(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Remove one scheduled space and its seven saved daily schedules."""
+    if (entry := _entry_data(hass)) is None:
+        connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "Scheduler is not loaded")
+        return
+    entry_id, entry_data = entry
+    try:
+        updated_configuration = remove_scheduled_space(entry_data["configuration"], msg["room_id"])
+    except ValueError as err:
+        connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, str(err))
+        return
+    await async_save_configuration(hass, entry_id, updated_configuration)
+    connection.send_result(msg["id"], updated_configuration.to_dict())
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "visual_climate_scheduler/set_sidebar_shortcut",
+        vol.Required("show_panel"): bool,
+    }
+)
+@websocket_api.async_response
+async def ws_set_sidebar_shortcut(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Persist the optional sidebar shortcut without changing schedules."""
+    if (entry := _entry_data(hass)) is None:
+        connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "Scheduler is not loaded")
+        return
+    entry_id, entry_data = entry
+    configuration = entry_data["configuration"]
+    updated_configuration = ScheduleConfiguration(
+        rooms=configuration.rooms,
+        settings={**configuration.settings, CONF_SHOW_PANEL: msg["show_panel"]},
+        temperature_unit=configuration.temperature_unit,
+    )
+    await async_save_configuration(hass, entry_id, updated_configuration)
+    await async_sync_panel(hass, msg["show_panel"])
+    connection.send_result(msg["id"], updated_configuration.to_dict())
 
 
 @websocket_api.require_admin

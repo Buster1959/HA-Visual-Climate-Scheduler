@@ -10,7 +10,7 @@ Visual Climate Scheduler
       +--> Schedule engine
       +--> Runtime state / overrides
       +--> Optional ZEAL discovery context
-      +--> Optional native HA sidebar schedule editor
+      +--> Native HA schedule editor (direct integration launch; optional sidebar shortcut)
       +--> Mobile quick-control
       |
       v
@@ -25,14 +25,20 @@ The scheduler does not control heat pumps, boilers, pumps or HVAC plant.
 ## Persistence
 Use Home Assistant's Store helper for versioned JSON-serialisable persistent configuration. Runtime state is kept separately and is not part of the persistent schedule model.
 
-## Sidebar editor
-The native Home Assistant sidebar editor is optional, admin-only and controlled
-by the persisted `settings.show_panel` preference from the integration's
-Configure menu. It reads and writes only the configuration document through a
-small admin-only WebSocket boundary. That boundary validates an edited seven-day
-room/zone document through the durable model before saving it and immediately
-refreshing the running deterministic scheduler. It does not introduce a second
-schedule model or persist runtime state.
+## Scheduler editor
+The native Home Assistant scheduler editor is admin-only and registered as the
+integration's configuration panel, so it is always reachable through the
+integration's **Configure** action. The persisted `settings.show_panel`
+preference only controls its optional sidebar shortcut. It reads and writes only
+the configuration document through a small admin-only WebSocket boundary. That
+boundary validates an edited seven-day room/zone document through the durable
+model before saving it and immediately refreshing the running deterministic
+scheduler. It does not introduce a second schedule model or persist runtime
+state.
+
+The same editor contains the small room/zone management view. This avoids a
+second management route being hidden by the direct Configure launch, while
+reusing the existing validated room operations and persistence boundary.
 
 ## Optional ZEAL discovery
 When ZEAL is installed, the integration can discover ZEAL's canonical room

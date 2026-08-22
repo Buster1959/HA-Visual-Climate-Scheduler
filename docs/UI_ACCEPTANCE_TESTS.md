@@ -3,6 +3,11 @@
 These are human-facing UX tests for the visual scheduler. Passing technical tests is not sufficient if the interaction is frustrating or ambiguous.
 
 ## Navigation
+- With the sidebar shortcut disabled, open **Visual Climate Scheduler →
+  Configure** and confirm the full scheduler opens directly.
+- Enable the optional sidebar shortcut and confirm it opens the same scheduler.
+- Disable the shortcut again and confirm direct Configure launch remains
+  available and schedules are unchanged.
 - Select a ZEAL Zone and verify Floor/Room are filtered.
 - Select a Floor and verify Room is filtered.
 - When ZEAL is absent, fall back to the generic HA hierarchy.
