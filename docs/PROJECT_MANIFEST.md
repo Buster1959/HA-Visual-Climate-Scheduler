@@ -38,9 +38,10 @@ Completed:
 - Sidebar visibility is a persisted preference and never changes saved schedules
 - A scheduled room/zone can be modified to add or remove thermostat targets without losing its schedule
 - Sidebar day application uses an explicit source day plus selected destination-day checkboxes
+- Pre-release Instructions for Use are maintained in the GitHub Wiki and versioned in the repository
 
 Key decisions:
-- D-001 through D-046 are captured in DECISIONS.md
+- D-001 through D-047 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 

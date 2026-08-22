@@ -2,6 +2,12 @@
 
 A modern Home Assistant climate scheduler built around independent daily schedules, visual editing, and real-world usability.
 
+## Trying this pre-release
+
+Read the [Instructions for Use](https://github.com/Buster1959/HA-Visual-Climate-Scheduler/wiki/Instructions-for-Use)
+before installing. They cover safe test setup, room/zone configuration, the
+sidebar editor and the current limitations for this checkpoint.
+
 ## Checkpoint 0.11.0-dev
 
 **Block 7 — Room Management & Day Apply**

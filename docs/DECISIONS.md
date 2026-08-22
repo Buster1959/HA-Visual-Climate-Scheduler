@@ -46,3 +46,4 @@
 - **D-044** — The panel edits one configured room/zone's seven daily lists through the same validated persistence model used everywhere else. The initial panel exposes up to four periods per day; Apply, Copy and temporary override controls remain visibly unavailable until their separate behaviour is implemented.
 - **D-045** — Modifying a scheduled space retains its stable room ID and all seven daily schedules. Its climate target list may change, provided no target belongs to another space.
 - **D-046** — Day application is explicit: one source day and checked destination days. It copies detached day lists locally; the normal Save action validates and persists the result.
+- **D-047** — Each pre-release publishes matching Instructions for Use in the GitHub Wiki and keeps a versioned source copy in the repository. The README links users to the current Wiki guide.

@@ -5,6 +5,7 @@ Snapshot: 0.11.0-dev
 
 ## Added
 - `release_notes/RELEASE_NOTES_0.11.0-dev.md` — Block 7 release notes
+- `docs/INSTRUCTIONS_FOR_USE.md` — versioned pre-release user guide
 
 ## Modified
 - `MANIFEST.md`
