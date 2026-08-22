@@ -90,7 +90,8 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     if (target.dataset.action === "copy-target") {
       if (target.checked) this._copyTargets.add(target.value);
       else this._copyTargets.delete(target.value);
-      this._render();
+      const copyButton = this.shadowRoot.querySelector('[data-action="copy-room-schedule"]');
+      if (copyButton) copyButton.disabled = !this._copyTargets.size;
       return;
     }
     if (target.dataset.action === "quick-room") {
