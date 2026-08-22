@@ -14,6 +14,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.selector import selector
 
 from .const import (
+    CONF_ADD_ANOTHER,
     CONF_AREA_ID,
     CONF_CLIMATE_ENTITY_IDS,
     CONF_ROOM_ID,
@@ -99,6 +100,8 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
                     errors["base"] = "duplicate_climate_entity"
                 else:
                     await async_save_configuration(self.hass, self.config_entry.entry_id, configuration)
+                    if user_input[CONF_ADD_ANOTHER]:
+                        return await self.async_step_add_scheduled_space()
                     return self.async_create_entry(title="", data={})
 
         return self.async_show_form(
@@ -110,6 +113,7 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
                     vol.Required(CONF_CLIMATE_ENTITY_IDS): selector(
                         {"entity": {"filter": {"domain": CLIMATE_DOMAIN}, "multiple": True}}
                     ),
+                    vol.Optional(CONF_ADD_ANOTHER, default=False): selector({"boolean": {}}),
                 }
             ),
             errors=errors,

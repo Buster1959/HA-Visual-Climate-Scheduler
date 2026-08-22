@@ -10,6 +10,7 @@ ATTR_ROOM_ID = "room_id"
 ATTR_TEMPERATURE = "temperature"
 
 CONF_AREA_ID = "area_id"
+CONF_ADD_ANOTHER = "add_another"
 CONF_CLIMATE_ENTITY_IDS = "climate_entity_ids"
 CONF_ROOM_ID = "room_id"
 CONF_ROOM_NAME = "room_name"

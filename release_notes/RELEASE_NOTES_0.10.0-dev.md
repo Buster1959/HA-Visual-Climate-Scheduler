@@ -13,6 +13,9 @@
 
 ## Changed
 
+- The Add room or zone form now offers **Add another room or zone after
+  saving**. This keeps the next blank room form open after Submit, which is the
+  standard Home Assistant form equivalent of a separate “Next Room” button.
 - Sidebar edits are parsed back through the durable schedule model before they
   can be saved. Existing conflict, ordering, exact-minute and JSON-safe
   validation therefore applies equally to UI changes.

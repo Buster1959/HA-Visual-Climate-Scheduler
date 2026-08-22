@@ -25,7 +25,8 @@
         "data": {
           "room_name": "Room or zone name",
           "area_id": "Home Assistant Area (optional)",
-          "climate_entity_ids": "Climate thermostats"
+          "climate_entity_ids": "Climate thermostats",
+          "add_another": "Add another room or zone after saving"
         }
       },
       "remove_scheduled_space": {
