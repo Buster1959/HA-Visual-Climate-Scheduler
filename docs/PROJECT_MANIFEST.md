@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.10.0-dev
-Phase: Block 6 — Functional Schedule Editor
-Status: Optional native HA sidebar editor creates and persists schedules for configured spaces
+Project version: 0.11.0-dev
+Phase: Block 7 — Room Management & Day Apply
+Status: Scheduled spaces can be amended safely and daily schedules can be explicitly applied to selected days
 
 ## Session checkpoint
 
@@ -36,15 +36,17 @@ Completed:
 - Editor changes are validated by the durable data model, persisted through HA Store and applied to the running engine
 - First editor supports direct period name, exact time and temperature editing for seven independent days
 - Sidebar visibility is a persisted preference and never changes saved schedules
+- A scheduled room/zone can be modified to add or remove thermostat targets without losing its schedule
+- Sidebar day application uses an explicit source day plus selected destination-day checkboxes
 
 Key decisions:
-- D-001 through D-044 are captured in DECISIONS.md
+- D-001 through D-046 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 
 Next session:
 - Add temporary overrides as a separate layer over the deterministic engine
-- Add explicit copy/apply-to-days actions and richer timeline interaction
+- Add richer timeline interaction
 
 ## Repository workflow
 

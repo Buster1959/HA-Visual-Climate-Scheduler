@@ -15,6 +15,7 @@
       "init": {
         "menu_options": {
           "add_scheduled_space": "Add a room or zone",
+          "modify_scheduled_space": "Modify a room or zone",
           "remove_scheduled_space": "Remove a room or zone",
           "panel_settings": "Sidebar editor"
         }
@@ -33,6 +34,21 @@
         "title": "Remove room or zone",
         "data": {
           "room_id": "Room or zone"
+        }
+      },
+      "modify_scheduled_space": {
+        "title": "Modify room or zone",
+        "data": {
+          "room_id": "Room or zone"
+        }
+      },
+      "modify_scheduled_space_details": {
+        "title": "Modify room or zone",
+        "description": "Change the room details or add/remove its climate thermostats. Its saved daily schedules are kept.",
+        "data": {
+          "room_name": "Room or zone name",
+          "area_id": "Home Assistant Area (optional)",
+          "climate_entity_ids": "Climate thermostats"
         }
       },
       "panel_settings": {

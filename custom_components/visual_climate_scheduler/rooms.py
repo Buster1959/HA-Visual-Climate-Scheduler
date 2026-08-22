@@ -64,3 +64,41 @@ def remove_scheduled_space(
     rooms = dict(configuration.rooms)
     rooms.pop(room_id)
     return ScheduleConfiguration(rooms=rooms, settings=configuration.settings)
+
+
+def update_scheduled_space(
+    configuration: ScheduleConfiguration,
+    room_id: str,
+    *,
+    name: str,
+    climate_entity_ids: Iterable[str],
+    area_id: str | None = None,
+) -> ScheduleConfiguration:
+    """Update a space's details and targets without replacing its schedule.
+
+    The room ID remains stable when its display name changes. Existing targets
+    may stay assigned to this space, but may not be moved in from another one.
+    """
+    existing_room = configuration.rooms.get(room_id)
+    if existing_room is None:
+        raise ValueError(f"unknown scheduled space: {room_id}")
+    entity_ids = tuple(climate_entity_ids)
+    used_elsewhere = {
+        entity_id
+        for other_room_id, room in configuration.rooms.items()
+        if other_room_id != room_id
+        for entity_id in room.climate_entity_ids
+    }
+    overlap = used_elsewhere.intersection(entity_ids)
+    if overlap:
+        raise ValueError(f"climate target is already scheduled: {sorted(overlap)[0]}")
+    updated_room = RoomSchedule(
+        id=existing_room.id,
+        name=name,
+        area_id=area_id,
+        climate_entity_ids=entity_ids,
+        days=existing_room.days,
+    )
+    return ScheduleConfiguration(
+        rooms={**configuration.rooms, room_id: updated_room}, settings=configuration.settings
+    )

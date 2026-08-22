@@ -5,6 +5,8 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     this._configuration = null;
     this._roomId = null;
     this._days = null;
+    this._sourceDay = null;
+    this._selectedDays = new Set();
     this._message = "";
     this.shadowRoot.addEventListener("click", (event) => this._onClick(event));
     this.shadowRoot.addEventListener("change", (event) => this._onChange(event));
@@ -39,6 +41,8 @@ class VisualClimateSchedulerPanel extends HTMLElement {
   _loadRoom(clearMessage = true) {
     const room = this._configuration?.rooms[this._roomId];
     this._days = room ? structuredClone(room.days) : null;
+    this._sourceDay = this._days ? Object.keys(this._days)[0] : null;
+    this._selectedDays = new Set();
     if (clearMessage) this._message = "";
     this._render();
   }
@@ -48,6 +52,17 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     if (target.dataset.action === "room") {
       this._roomId = target.value;
       this._loadRoom();
+      return;
+    }
+    if (target.dataset.action === "source-day") {
+      this._sourceDay = target.value;
+      this._render();
+      return;
+    }
+    if (target.dataset.action === "target-day") {
+      if (target.checked) this._selectedDays.add(target.value);
+      else this._selectedDays.delete(target.value);
+      this._render();
       return;
     }
     const { day, index, field } = target.dataset;
@@ -63,6 +78,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     const { action, day, index } = button.dataset;
     if (action === "add") this._addPeriod(day);
     if (action === "remove") this._days[day].splice(Number(index), 1);
+    if (action === "apply") this._applyToSelectedDays();
     if (action === "save") this._save();
     this._render();
   }
@@ -78,6 +94,16 @@ class VisualClimateSchedulerPanel extends HTMLElement {
       time: "12:00",
       temperature: 20,
     });
+  }
+
+  _applyToSelectedDays() {
+    const targetDays = [...this._selectedDays].filter((day) => day !== this._sourceDay);
+    if (!this._sourceDay || !targetDays.length) {
+      this._message = "Choose a source day and tick at least one different day to apply it to.";
+      return;
+    }
+    for (const day of targetDays) this._days[day] = structuredClone(this._days[this._sourceDay]);
+    this._message = `${this._sourceDay[0].toUpperCase()}${this._sourceDay.slice(1)} applied to ${targetDays.join(", ")}. Save schedule to keep it.`;
   }
 
   async _save() {
@@ -118,7 +144,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
         <input aria-label="${day} period temperature" type="number" step="0.1" data-day="${day}" data-index="${index}" data-field="temperature" value="${this._escape(period.temperature)}">
         <span>°</span><button class="icon" data-action="remove" data-day="${day}" data-index="${index}" title="Remove period">×</button>
       </div>`).join("");
-    return `<section class="day-card"><h2>${day}</h2><div class="labels"><span>Name</span><span>Time</span><span>Target</span></div>${rows || '<p class="empty">No periods yet.</p>'}<button class="secondary" data-action="add" data-day="${day}" ${periods.length >= 4 ? "disabled" : ""}>+ Add period</button></section>`;
+    return `<section class="day-card"><div class="day-heading"><h2>${day}</h2><label><input type="radio" name="source-day" data-action="source-day" value="${day}" ${this._sourceDay === day ? "checked" : ""}> Source</label><label><input type="checkbox" data-action="target-day" value="${day}" ${this._selectedDays.has(day) ? "checked" : ""}> Apply here</label></div><div class="labels"><span>Name</span><span>Time</span><span>Target</span></div>${rows || '<p class="empty">No periods yet.</p>'}<button class="secondary" data-action="add" data-day="${day}" ${periods.length >= 4 ? "disabled" : ""}>+ Add period</button></section>`;
   }
 
   _render() {
@@ -136,7 +162,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
         select { min-width:290px; } button { border:0; border-radius:7px; min-height:38px; padding:0 14px; background:var(--primary-color); color:var(--text-primary-color); font:inherit; cursor:pointer; } button.secondary { background:var(--secondary-background-color); color:var(--primary-text-color); width:100%; margin-top:10px; } button:disabled { opacity:.48; cursor:not-allowed; } button.icon { min-width:32px; padding:0; background:transparent; color:var(--error-color); font-size:24px; }
         .notice { margin:0 0 18px; padding:12px 14px; border-radius:8px; background:var(--info-color, #2196f3); color:white; }
         .week { display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:16px; }
-        .day-card, .blank, .advanced { background:var(--card-background-color); box-shadow:var(--ha-card-box-shadow, 0 1px 3px #0002); border-radius:12px; padding:18px; }
+        .day-card, .blank, .advanced { background:var(--card-background-color); box-shadow:var(--ha-card-box-shadow, 0 1px 3px #0002); border-radius:12px; padding:18px; }.day-heading { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }.day-heading h2 { margin:0 auto 0 0; }.day-heading label { display:flex; align-items:center; gap:4px; color:var(--secondary-text-color); font-size:13px; white-space:nowrap; }.day-heading input { min-height:auto; }
         .labels, .period-row { display:grid; grid-template-columns:minmax(96px,1.5fr) 86px 78px 14px 32px; gap:7px; align-items:center; }
         .labels { color:var(--secondary-text-color); font-size:12px; margin-bottom:4px; padding:0 4px; }.period-row { margin:7px 0; }.period-row input:first-child { min-width:0; }
         .advanced { margin-top:22px; }.advanced button { margin:0 8px 8px 0; }.blank { text-align:center; padding:48px; }
@@ -146,7 +172,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
         <header><div><h1>Visual Climate Scheduler</h1><p class="subtitle">Seven independent daily schedules. Changes save immediately.</p></div><label>Scheduled space<br><select data-action="room">${options}</select></label></header>
         ${this._message ? `<p class="notice">${this._escape(this._message)}</p>` : ""}
         ${editor}
-        <div class="advanced"><h2>Coming later</h2><button disabled>Apply to selected days</button><button disabled>Copy schedule</button><button disabled>Temporary override</button><button data-action="save" ${this._days ? "" : "disabled"}>Save schedule</button></div>
+        <div class="advanced"><h2>Apply schedule</h2><p class="subtitle">Choose one Source day, tick Apply here on the destination days, then save.</p><button data-action="apply" ${this._days ? "" : "disabled"}>Apply to selected days</button><button disabled>Temporary override</button><button data-action="save" ${this._days ? "" : "disabled"}>Save schedule</button></div>
       </main>`;
   }
 }
