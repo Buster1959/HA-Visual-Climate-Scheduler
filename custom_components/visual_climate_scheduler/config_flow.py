@@ -63,12 +63,12 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
         """Present the small room-setup menu."""
         return self.async_show_menu(
             step_id="init",
-            menu_options=[
-                "add_scheduled_space",
-                "modify_scheduled_space",
-                "remove_scheduled_space",
-                "panel_settings",
-            ],
+            menu_options={
+                "add_scheduled_space": "Add a room or zone",
+                "modify_scheduled_space": "Modify a room or zone",
+                "remove_scheduled_space": "Remove a room or zone",
+                "panel_settings": "Sidebar editor",
+            },
         )
 
     async def async_step_add_scheduled_space(

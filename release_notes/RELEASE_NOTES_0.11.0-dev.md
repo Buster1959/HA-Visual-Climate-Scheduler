@@ -20,6 +20,12 @@
 - The destination-day copies are detached from the source day, preserving the
   seven-day independent model after the application.
 
+## Fixed
+
+- The Configure-menu label for **Modify a room or zone** is now explicit in
+  the flow, preventing a stale translation cache from rendering a blank menu
+  row.
+
 ## Not included
 
 - Temporary overrides, timeline drag editing and learning.
