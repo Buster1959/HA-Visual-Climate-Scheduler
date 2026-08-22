@@ -21,6 +21,18 @@ class OverrideTests(unittest.TestCase):
         self.assertEqual([override.temperature for override in overrides], [21, 20])
         self.assertEqual(overrides[0].expires_at, datetime(2026, 8, 24, 10, 0))
 
+    def test_delta_steps_from_an_existing_hold(self) -> None:
+        overrides = create_temporary_overrides(
+            self.configuration,
+            ["lounge", "bedroom"],
+            now=self.now,
+            duration="2h",
+            operation="delta",
+            value=1,
+            base_temperatures={"lounge": 22},
+        )
+        self.assertEqual([override.temperature for override in overrides], [23, 19])
+
     def test_next_change_is_independent_per_room(self) -> None:
         overrides = create_temporary_overrides(self.configuration, ["lounge", "bedroom"], now=self.now, duration="next_change", operation="temperature", value=21)
         self.assertEqual(overrides[0].expires_at, datetime(2026, 8, 31, 6, 0))

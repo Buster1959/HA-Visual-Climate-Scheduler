@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import math
-from typing import Literal
+from typing import Literal, Mapping
 
 from .engine import active_period_at, next_transition_after
 from .models import ScheduleConfiguration
@@ -39,6 +39,7 @@ def create_temporary_overrides(
     duration: OverrideDuration,
     value: float,
     operation: Literal["delta", "temperature"],
+    base_temperatures: Mapping[str, float] | None = None,
 ) -> list[TemporaryOverride]:
     """Resolve a batch action into independent overrides for each space."""
     if not room_ids or len(set(room_ids)) != len(room_ids):
@@ -56,7 +57,7 @@ def create_temporary_overrides(
         if operation == "delta":
             if active is None:
                 raise ValueError(f"{room.name} has no active scheduled target to adjust")
-            target = active.period.temperature + value
+            target = (base_temperatures or {}).get(room_id, active.period.temperature) + value
         else:
             target = value
         if duration == "2h":

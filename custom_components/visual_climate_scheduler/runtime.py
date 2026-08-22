@@ -132,7 +132,20 @@ class ScheduleRuntime:
     async def async_set_temporary_override(self, room_ids: list[str], *, duration: str, value: float, operation: str) -> list[TemporaryOverride]:
         """Apply a transient batch action without changing persisted schedules."""
         now = dt_util.now()
-        overrides = create_temporary_overrides(self._configuration, room_ids, now=now, duration=duration, value=value, operation=operation)
+        base_temperatures = {
+            room_id: override.temperature
+            for room_id, override in self._overrides.items()
+            if room_id in room_ids and override.expires_at > now
+        }
+        overrides = create_temporary_overrides(
+            self._configuration,
+            room_ids,
+            now=now,
+            duration=duration,
+            value=value,
+            operation=operation,
+            base_temperatures=base_temperatures,
+        )
         self._overrides.update({override.room_id: override for override in overrides})
         self._applied_periods.clear()
         self._cancel_pending_transition()
