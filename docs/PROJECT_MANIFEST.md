@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.12.0-dev
-Phase: Block 8 — Visual Timeline Slider Editor
-Status: Every independently scheduled day has a draggable temperature timeline plus exact controls
+Project version: 0.13.0-dev
+Phase: Block 9 — Quick Change & Temporary Overrides
+Status: Separate Quick Change view applies cancellable temporary holds without modifying schedules
 
 ## Session checkpoint
 

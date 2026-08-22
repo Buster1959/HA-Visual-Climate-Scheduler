@@ -1,7 +1,7 @@
 # Session Manifest
 
 Project: HA Visual Climate Scheduler
-Snapshot: 0.12.0-dev
+Snapshot: 0.13.0-dev
 
 ## Added
 - `release_notes/RELEASE_NOTES_0.11.0-dev.md` — Block 7 release notes
