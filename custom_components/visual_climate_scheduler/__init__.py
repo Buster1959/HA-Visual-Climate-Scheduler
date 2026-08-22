@@ -14,16 +14,20 @@ if TYPE_CHECKING:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Visual Climate Scheduler from a config entry."""
     # Keep the schedule model importable for isolated validation and migrations.
+    from .runtime import ScheduleRuntime
     from .services import async_register_services
     from .storage import ScheduleStorage
     from .zeal import async_discover_zeal_rooms
 
     storage = ScheduleStorage(hass, entry.entry_id)
     configuration = await storage.async_load()
+    runtime = ScheduleRuntime(hass)
+    await runtime.async_start(configuration)
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         "configuration": configuration,
         "storage": storage,
+        "runtime": runtime,
         # Optional Block 2 context. It is runtime-only and never stored with schedules.
         "zeal_discovery": await async_discover_zeal_rooms(hass),
     }
@@ -33,7 +37,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a Visual Climate Scheduler config entry."""
-    hass.data[DOMAIN].pop(entry.entry_id, None)
+    entry_data = hass.data[DOMAIN].pop(entry.entry_id, None)
+    if entry_data is not None:
+        await entry_data["runtime"].async_stop()
     if not hass.data[DOMAIN]:
         hass.data.pop(DOMAIN)
         hass.services.async_remove(DOMAIN, "set_zeal_room_temperature")

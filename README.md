@@ -2,12 +2,13 @@
 
 A modern Home Assistant climate scheduler built around independent daily schedules, visual editing, and real-world usability.
 
-## Checkpoint 0.7.0-dev
+## Checkpoint 0.8.0-dev
 
-**Block 3 — V1 Schedule Data Model & Persistence Boundary**
+**Block 4 — V1 Deterministic Schedule Engine**
 
-The versioned, human-readable schedule model and Home Assistant Store adapter
-are implemented. Schedule execution has not been started.
+The versioned, human-readable schedule model, Home Assistant Store adapter and
+deterministic schedule engine are implemented. The engine applies the active
+period at startup and schedules the next persisted transition.
 
 ## V1
 - Visual PC/tablet timeline editor

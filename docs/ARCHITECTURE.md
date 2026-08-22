@@ -40,5 +40,13 @@ schedule type, alter stored rooms or execute schedules.
 - Runtime state separate from configuration
 - Schedules survive device unavailability
 
+## Schedule execution
+
+The V1 engine is deterministic. At integration startup it resolves each room's
+latest period and applies its target to that room's configured climate entity.
+It then schedules only the nearest future transition. If a day is empty, the
+most recent period from an earlier populated day remains active; no setpoint is
+invented. Active-period tracking and timer handles are runtime-only.
+
 ## Future learning
 V2 learning consumes user behaviour/history without contaminating the deterministic V1 schedule engine.

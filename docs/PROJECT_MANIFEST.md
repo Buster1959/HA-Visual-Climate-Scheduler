@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.7.0-dev
-Phase: Block 3 — V1 Schedule Data Model & Persistence Boundary
-Status: Versioned schedule persistence boundary complete; scheduler behaviour not yet implemented
+Project version: 0.8.0-dev
+Phase: Block 4 — V1 Deterministic Schedule Engine
+Status: Core active-period resolution and runtime transition scheduling implemented
 
 ## Session checkpoint
 
@@ -28,16 +28,18 @@ Completed:
 - ZEAL discovery decisions retained as optional navigation context only
 - Block 2 ZEAL discovery, diagnostics and explicit thermostat-only test action retained
 - Standing principle "Simple underneath, friendly on top" recorded
+- Deterministic active-period calculation added, including overnight and empty-day carry-over
+- Home Assistant runtime adapter applies startup targets and schedules the nearest transition
 
 Key decisions:
-- D-001 through D-038 are captured in DECISIONS.md
+- D-001 through D-040 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 
 Next session:
 - Add area/climate discovery and room configuration
-- Implement the schedule engine against the persisted model
 - Connect the existing UI acceptance criteria to production UI work
+- Add temporary overrides as a separate layer over the deterministic engine
 
 ## Repository workflow
 
