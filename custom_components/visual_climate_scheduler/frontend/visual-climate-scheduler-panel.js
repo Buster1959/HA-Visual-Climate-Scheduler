@@ -149,13 +149,14 @@ class VisualClimateSchedulerPanel extends HTMLElement {
 
   _render() {
     const rooms = this._configuration?.rooms || {};
+    const brandIconUrl = this._hass?.hassUrl?.("/api/brands/integration/visual_climate_scheduler/icon.png") || "/api/brands/integration/visual_climate_scheduler/icon.png";
     const options = Object.entries(rooms).map(([id, room]) => `<option value="${this._escape(id)}" ${id === this._roomId ? "selected" : ""}>${this._escape(room.name)} · ${room.climate_entity_ids.length} thermostat${room.climate_entity_ids.length === 1 ? "" : "s"}</option>`).join("");
     const editor = this._days ? `<div class="week">${Object.keys(this._days).map((day) => this._renderPeriods(day)).join("")}</div>` : `<div class="blank"><h2>No rooms or zones configured</h2><p>Open the integration’s Configure menu and add a room or zone before creating schedules.</p></div>`;
     this.shadowRoot.innerHTML = `
       <style>
         :host { display:block; min-height:100%; background:var(--primary-background-color); color:var(--primary-text-color); font-family:var(--primary-font-family, sans-serif); }
         main { max-width:1500px; margin:0 auto; padding:28px; }
-        header { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:22px; }
+        header { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:22px; }.title { display:flex; align-items:center; gap:12px; }.brand-icon { width:46px; height:46px; object-fit:contain; flex:none; }
         h1 { margin:0; font-size:30px; } h2 { margin:0 0 12px; font-size:17px; text-transform:capitalize; }
         .subtitle, .empty { color:var(--secondary-text-color); margin:6px 0 0; }
         select, input { box-sizing:border-box; min-height:38px; border:1px solid var(--divider-color); border-radius:7px; background:var(--card-background-color); color:var(--primary-text-color); padding:6px 8px; font:inherit; }
@@ -169,7 +170,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
         @media (max-width:600px) { main { padding:16px; } select { min-width:100%; } .period-row { grid-template-columns:1fr 78px 67px 12px 28px; gap:4px; } }
       </style>
       <main>
-        <header><div><h1>Visual Climate Scheduler</h1><p class="subtitle">Seven independent daily schedules. Changes save immediately.</p></div><label>Scheduled space<br><select data-action="room">${options}</select></label></header>
+        <header><div class="title"><img class="brand-icon" src="${brandIconUrl}" alt=""><div><h1>Visual Climate Scheduler</h1><p class="subtitle">Seven independent daily schedules. Changes save immediately.</p></div></div><label>Scheduled space<br><select data-action="room">${options}</select></label></header>
         ${this._message ? `<p class="notice">${this._escape(this._message)}</p>` : ""}
         ${editor}
         <div class="advanced"><h2>Apply schedule</h2><p class="subtitle">Choose one Source day, tick Apply here on the destination days, then save.</p><button data-action="apply" ${this._days ? "" : "disabled"}>Apply to selected days</button><button disabled>Temporary override</button><button data-action="save" ${this._days ? "" : "disabled"}>Save schedule</button></div>
