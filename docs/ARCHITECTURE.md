@@ -7,6 +7,7 @@ Home Assistant
 Visual Climate Scheduler
       |
       +--> Persistent configuration (HA Store / JSON-serialisable)
+      +--> Persistent bounded application audit (separate HA Store)
       +--> Schedule engine
       +--> Runtime state / overrides
       +--> Standard HA climate entity discovery
@@ -25,6 +26,12 @@ The scheduler does not control heat pumps, boilers, pumps or HVAC plant.
 ## Persistence
 Use Home Assistant's Store helper for versioned JSON-serialisable persistent configuration. Runtime state is kept separately and is not part of the persistent schedule model.
 
+The thermostat application audit uses a second versioned Store document. The
+runtime appends one result for each attempted `climate.set_temperature` call,
+including unavailable and failed targets, and retains the latest 5,000
+entries. The admin-only WebSocket API exposes a detached export document for
+download; audit records never become part of the schedule configuration.
+
 ## Scheduler editor
 The native Home Assistant scheduler editor is admin-only and registered as the
 integration's configuration panel, so it is always reachable through the
@@ -34,7 +41,8 @@ the configuration document through a small admin-only WebSocket boundary. That
 boundary validates an edited seven-day room/zone document through the durable
 model before saving it and immediately refreshing the running deterministic
 scheduler. It does not introduce a second schedule model or persist runtime
-state.
+state. It also provides read-only downloads of the current configuration and
+the separate audit export.
 
 The same editor contains the small room/zone management view. This avoids a
 second management route being hidden by the direct Configure launch, while

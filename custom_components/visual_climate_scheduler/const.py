@@ -18,7 +18,10 @@ PANEL_URL_PATH = DOMAIN
 PANEL_STATIC_URL = f"/{DOMAIN}_static"
 # Changes whenever the bundled panel JavaScript changes, so a browser never
 # reuses an older editor after an integration update.
-PANEL_ASSET_VERSION = "1.0.0"
+PANEL_ASSET_VERSION = "1.0.0-1"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = DOMAIN
+
+AUDIT_STORAGE_VERSION = 1
+AUDIT_MAX_ENTRIES = 5000

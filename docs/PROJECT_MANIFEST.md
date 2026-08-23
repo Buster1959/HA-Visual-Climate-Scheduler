@@ -49,9 +49,11 @@ Completed:
 - Bundled panel assets use a versioned URL so an integration update does not reuse a stale browser-cached editor
 - Empty installations open directly to room/zone setup and list standard Home Assistant climate entities
 - Copying schedules offers Select all / Clear all and timelines visibly carry the prior day's final target across midnight
+- Rooms and zones provides JSON configuration export and a downloadable,
+  separately persisted audit of the latest 5,000 thermostat applications
 
 Key decisions:
-- D-001 through D-055 are captured in DECISIONS.md
+- D-001 through D-056 are captured in DECISIONS.md
 - V1 scheduler is deterministic
 - V2 learning is separate and initially recommendation-based
 

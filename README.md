@@ -38,6 +38,10 @@ selected days** and Save. Hiding the sidebar checkbox removes only the optional
 navigation shortcut; the direct integration launch and saved schedules remain
 available.
 
+The **Rooms and zones** page also provides JSON downloads for the complete
+saved configuration and a persistent audit trail of recent target-temperature
+applications, including their reason and outcome.
+
 Every day card now has a visual temperature timeline. Drag a point left/right
 to move its time (15-minute steps) or up/down to change its target (0.5°C
 steps). Click a point to highlight its precise fields; those fields still allow
@@ -68,6 +72,7 @@ saved values in the wrong unit.
 - Room/Area climate entity discovery
 - Schedule copy/apply
 - Mobile quick-control with temporary overrides
+- Downloadable configuration and bounded thermostat application audit trail
 - No dependency on the Heat Control System
 
 ## V2

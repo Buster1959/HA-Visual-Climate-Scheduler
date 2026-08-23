@@ -12,6 +12,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import event as event_helper
 from homeassistant.util import dt as dt_util
 
+from .audit import AuditLog
 from .engine import ScheduledPeriod, active_period_at, next_transition_after
 from .models import RoomSchedule, ScheduleConfiguration
 from .overrides import TemporaryOverride, create_temporary_overrides
@@ -27,8 +28,9 @@ class ScheduleRuntime:
     at startup and arranges the next transition while Home Assistant is running.
     """
 
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: HomeAssistant, audit_log: AuditLog) -> None:
         self._hass = hass
+        self._audit_log = audit_log
         self._configuration = ScheduleConfiguration.empty()
         self._cancel_next: Callable[[], None] | None = None
         self._applied_periods: dict[str, tuple[datetime, str]] = {}
@@ -36,7 +38,7 @@ class ScheduleRuntime:
 
     async def async_start(self, configuration: ScheduleConfiguration) -> None:
         """Start from persisted configuration and reconcile current targets."""
-        await self.async_set_configuration(configuration)
+        await self.async_set_configuration(configuration, cause="startup_reconciliation")
 
     async def async_stop(self) -> None:
         """Cancel pending callbacks and discard ephemeral runtime state."""
@@ -44,7 +46,12 @@ class ScheduleRuntime:
         self._applied_periods.clear()
         self._overrides.clear()
 
-    async def async_set_configuration(self, configuration: ScheduleConfiguration) -> None:
+    async def async_set_configuration(
+        self,
+        configuration: ScheduleConfiguration,
+        *,
+        cause: str = "configuration_saved",
+    ) -> None:
         """Replace configuration, reconcile immediately, and arrange its next change.
 
         A future editor calls this after it has saved validated configuration via
@@ -56,7 +63,7 @@ class ScheduleRuntime:
         self._applied_periods.clear()
         self._cancel_pending_transition()
         now = dt_util.now()
-        await self._async_apply_active_periods(now)
+        await self._async_apply_active_periods(now, cause=cause)
         self._schedule_next_transition(now)
 
     def _cancel_pending_transition(self) -> None:
@@ -64,38 +71,91 @@ class ScheduleRuntime:
             self._cancel_next()
             self._cancel_next = None
 
-    async def _async_apply_active_periods(self, now: datetime) -> None:
+    async def _async_apply_active_periods(self, now: datetime, *, cause: str) -> None:
         """Apply only rooms whose active period changed since this runtime started."""
         for room in self._configuration.rooms.values():
             active = active_period_at(room, now)
             override = self._overrides.get(room.id)
+            override_expired = False
             if override is not None and override.expires_at <= now:
                 self._overrides.pop(room.id)
                 override = None
+                override_expired = True
             if active is None and override is None:
                 continue
             key = (override.expires_at, f"override:{override.temperature}") if override else (active.starts_at, active.period.id)
             if self._applied_periods.get(room.id) == key:
                 continue
             temperature = override.temperature if override else active.period.temperature
-            if await self._async_apply_temperature(room, temperature):
+            room_cause = "temporary_override_expired" if override_expired else cause
+            if await self._async_apply_temperature(
+                room, temperature, cause=room_cause, timestamp=now
+            ):
                 self._applied_periods[room.id] = key
 
-    async def _async_apply_temperature(self, room: RoomSchedule, temperature: float) -> bool:
+    async def _async_apply_temperature(
+        self,
+        room: RoomSchedule,
+        temperature: float,
+        *,
+        cause: str,
+        timestamp: datetime,
+    ) -> bool:
         """Call every configured target; never its HVAC internals or underlying TRVs."""
         applied = False
         for entity_id in room.climate_entity_ids:
-            if self._hass.states.get(entity_id) is None:
+            state = self._hass.states.get(entity_id)
+            previous = state.attributes.get(ATTR_TEMPERATURE) if state else None
+            previous_temperature = (
+                float(previous)
+                if isinstance(previous, (int, float)) and not isinstance(previous, bool)
+                else None
+            )
+            if state is None:
                 _LOGGER.warning("Scheduler target is unavailable for room %s: %s", room.id, entity_id)
+                await self._audit_log.async_record(
+                    timestamp=timestamp,
+                    room_id=room.id,
+                    room_name=room.name,
+                    entity_id=entity_id,
+                    previous_temperature=None,
+                    requested_temperature=temperature,
+                    cause=cause,
+                    outcome="skipped_unavailable",
+                )
                 continue
-            await self._hass.services.async_call(
-                CLIMATE_DOMAIN,
-                "set_temperature",
-                {
-                    ATTR_ENTITY_ID: entity_id,
-                    ATTR_TEMPERATURE: temperature,
-                },
-                blocking=True,
+            try:
+                await self._hass.services.async_call(
+                    CLIMATE_DOMAIN,
+                    "set_temperature",
+                    {
+                        ATTR_ENTITY_ID: entity_id,
+                        ATTR_TEMPERATURE: temperature,
+                    },
+                    blocking=True,
+                )
+            except Exception as err:
+                await self._audit_log.async_record(
+                    timestamp=timestamp,
+                    room_id=room.id,
+                    room_name=room.name,
+                    entity_id=entity_id,
+                    previous_temperature=previous_temperature,
+                    requested_temperature=temperature,
+                    cause=cause,
+                    outcome="failed",
+                    error=f"{type(err).__name__}: {err}",
+                )
+                raise
+            await self._audit_log.async_record(
+                timestamp=timestamp,
+                room_id=room.id,
+                room_name=room.name,
+                entity_id=entity_id,
+                previous_temperature=previous_temperature,
+                requested_temperature=temperature,
+                cause=cause,
+                outcome="applied",
             )
             applied = True
             _LOGGER.debug(
@@ -126,7 +186,7 @@ class ScheduleRuntime:
         self._hass.async_create_task(self._async_handle_transition(now))
 
     async def _async_handle_transition(self, now: datetime) -> None:
-        await self._async_apply_active_periods(now)
+        await self._async_apply_active_periods(now, cause="scheduled_transition")
         self._schedule_next_transition(now)
 
     async def async_set_temporary_override(self, room_ids: list[str], *, duration: str, value: float, operation: str) -> list[TemporaryOverride]:
@@ -149,7 +209,7 @@ class ScheduleRuntime:
         self._overrides.update({override.room_id: override for override in overrides})
         self._applied_periods.clear()
         self._cancel_pending_transition()
-        await self._async_apply_active_periods(now)
+        await self._async_apply_active_periods(now, cause="temporary_override_applied")
         self._schedule_next_transition(now)
         return overrides
 
@@ -159,7 +219,7 @@ class ScheduleRuntime:
         now = dt_util.now()
         self._applied_periods.clear()
         self._cancel_pending_transition()
-        await self._async_apply_active_periods(now)
+        await self._async_apply_active_periods(now, cause="temporary_override_cleared")
         self._schedule_next_transition(now)
 
     def quick_change_state(self) -> dict[str, object]:

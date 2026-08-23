@@ -12,9 +12,10 @@ Phase: V1 release preparation
 - Visual desktop/tablet editor and responsive mobile controls
 - Room/zone management for standard Home Assistant climate entities
 - Temporary Quick Change holds
+- Downloadable JSON configuration and persistent bounded application audit
 - User, architecture, data-model and handoff documentation
 - Root HACS metadata and HACS/Hassfest validation workflows
-- Python unit tests for models, engine, editor, rooms and overrides
+- Python unit tests for models, engine, editor, rooms, overrides and auditing
 
 ## Release gates
 

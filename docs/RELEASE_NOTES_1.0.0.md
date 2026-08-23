@@ -20,6 +20,8 @@ Assistant integration.
 - Home Assistant Store persistence with versioned migration and fixed
   temperature-unit safety.
 - Direct admin-only Configure launch with an optional sidebar shortcut.
+- Downloadable JSON configuration and a separate persistent audit trail of the
+  latest 5,000 thermostat target-application results.
 - Heating-system-agnostic operation with no dependency on HVAC internals or
   another custom integration.
 

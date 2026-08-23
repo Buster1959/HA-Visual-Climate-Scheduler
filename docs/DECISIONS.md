@@ -55,3 +55,7 @@
 - **D-053** — The Home Assistant temperature unit at initial setup is a fixed schedule reference. A later `°C`/`°F` change blocks setup until the integration is removed and re-added; values are never silently converted or reinterpreted.
 - **D-054** — The full scheduler is the integration's admin-only configuration panel and is always available through its Configure action. The persisted sidebar preference controls only an optional navigation shortcut, never access to the editor or any schedule data. Room/zone management remains available within that editor so the direct launch cannot hide it.
 - **D-055** — Friendly setup follows the available context: an empty scheduler opens on room/zone setup and offers standard Home Assistant climate entities. The visual timeline represents the same cross-midnight carry-over used by the engine; copying may select or clear all eligible destination spaces without creating a new schedule scope.
+- **D-056** — Configuration export is a read-only JSON download of the durable
+  schedule model. Thermostat application auditing is a separate, persistent,
+  bounded document containing the latest 5,000 per-entity results; it never
+  changes or becomes part of schedule configuration.

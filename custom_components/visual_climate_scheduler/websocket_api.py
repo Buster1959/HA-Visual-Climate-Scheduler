@@ -26,6 +26,7 @@ def async_register_commands(hass: HomeAssistant) -> None:
     if hass.data.get(_REGISTERED):
         return
     websocket_api.async_register_command(hass, ws_get_configuration)
+    websocket_api.async_register_command(hass, ws_get_audit_log)
     websocket_api.async_register_command(hass, ws_update_room_days)
     websocket_api.async_register_command(hass, ws_copy_room_schedule)
     websocket_api.async_register_command(hass, ws_save_scheduled_space)
@@ -54,6 +55,20 @@ def ws_get_configuration(
         return
     _, entry_data = entry
     connection.send_result(msg["id"], entry_data["configuration"].to_dict())
+
+
+@websocket_api.require_admin
+@websocket_api.websocket_command({vol.Required("type"): "visual_climate_scheduler/get_audit_log"})
+@callback
+def ws_get_audit_log(
+    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
+) -> None:
+    """Return the bounded thermostat-application audit document."""
+    if (entry := _entry_data(hass)) is None:
+        connection.send_error(msg["id"], websocket_api.ERR_NOT_FOUND, "Scheduler is not loaded")
+        return
+    _, entry_data = entry
+    connection.send_result(msg["id"], entry_data["audit_log"].export())
 
 
 @websocket_api.require_admin

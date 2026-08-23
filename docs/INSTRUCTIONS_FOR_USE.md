@@ -98,6 +98,27 @@ Scheduler** sidebar shortcut; it does not create a second editor or change any
 schedules. Unticking it removes that shortcut but the direct **Configure**
 launch remains available.
 
+### Download configuration and audit trail
+
+At the bottom of **Rooms and zones**, the **Downloads** card provides two JSON
+files:
+
+- **Download configuration** exports the complete saved scheduler
+  configuration, including settings, rooms/zones, assigned climate entity IDs
+  and every daily period. Keep this file private if entity IDs or room names
+  reveal details about your home. This V1 download is a readable backup and
+  support aid; it is not yet an import/restore function.
+- **Download audit trail** exports recent attempts by this integration to apply
+  a target temperature. Each entry records the time, room/zone, climate entity,
+  previous target when available, requested target, reason and outcome. Failed
+  or unavailable targets are identified instead of being silently omitted.
+
+The audit trail is stored separately from schedules, survives Home Assistant
+restarts and retains the latest 5,000 entries. It begins collecting only after
+the version containing this feature is installed, so it cannot reconstruct
+earlier thermostat changes. It records scheduler applications, not every
+temperature change made by other integrations or directly at a thermostat.
+
 ## Quick Change
 
 Choose **Quick Change** in the editor to make a temporary adjustment without

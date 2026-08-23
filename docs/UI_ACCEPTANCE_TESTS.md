@@ -92,3 +92,13 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Change Home Assistant to Fahrenheit and restart it.
 - Confirm the scheduler does not start or apply targets and instructs the user
   to remove and re-add the integration.
+
+## Downloads and audit
+
+- From **Rooms and zones**, download the configuration and confirm the JSON
+  contains the current rooms, climate entity IDs and all seven daily schedules.
+- Cause a scheduled transition, a temporary hold and an unavailable target,
+  then download the audit trail and confirm each attempt has a timestamp,
+  requested target, reason and outcome.
+- Restart Home Assistant and confirm earlier audit entries remain available.
+- Confirm the download controls remain usable on a mobile-sized layout.
