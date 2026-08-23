@@ -2,19 +2,16 @@
 
 A modern Home Assistant climate scheduler built around independent daily schedules, visual editing, and real-world usability.
 
-## Trying this pre-release
+## Visual Climate Scheduler 1.0.0
 
 Read the [Instructions for Use](https://github.com/Buster1959/HA-Visual-Climate-Scheduler/wiki/Instructions-for-Use)
-before installing. They cover safe test setup, room/zone configuration, the
-direct scheduler launch, the optional sidebar shortcut and the current
-limitations for this checkpoint.
+before installing. They cover room/zone configuration, the direct scheduler
+launch, the optional sidebar shortcut, mobile use and current limitations.
 
 The integration includes its own Home Assistant brand icon for current Home
 Assistant releases.
 
-## Checkpoint 0.16.2-dev
-
-**Block 12 — Setup and schedule-editor refinements**
+## What V1 provides
 
 Open the full, admin-only scheduler from **Settings → Devices & services →
 Visual Climate Scheduler → Configure**, without adding anything to the
@@ -70,10 +67,10 @@ saved values in the wrong unit.
 - Exact time and setpoint entry
 - Room/Area climate entity discovery
 - Schedule copy/apply
-- Mobile quick-control with temporary/permanent overrides
+- Mobile quick-control with temporary overrides
 - No dependency on the Heat Control System
 
 ## V2
 Optional learning of repeated user behaviour, including temperature/time changes, with suggestions before automatic changes are considered.
 
-See `docs/PROJECT_MANIFEST.md` for the current project checkpoint.
+See `docs/RELEASE_NOTES_1.0.0.md` for the V1 release summary.

@@ -10,7 +10,8 @@ Integration skeleton, config flow, area/climate discovery, persistent storage, s
 Copy/apply, overrides, startup reconciliation, validation, error handling and tests.
 
 ## Phase 3 — V1 Release
-User documentation, Wiki, HACS packaging and release process.
+V1 code, user documentation, Wiki and HACS packaging are complete. External
+validation, the GitHub release and HACS default-catalog submission remain.
 
 ## Phase 4 — V2 Learning
 Behaviour history, pattern detection, time/temperature learning, confidence and suggestions.

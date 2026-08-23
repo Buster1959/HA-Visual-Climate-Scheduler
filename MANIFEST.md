@@ -1,41 +1,32 @@
-# Session Manifest
+# Release Manifest
 
 Project: HA Visual Climate Scheduler
-Snapshot: 0.13.0-dev
+Release: 1.0.0
+Phase: V1 release preparation
 
-## Added
-- `release_notes/RELEASE_NOTES_0.11.0-dev.md` — Block 7 release notes
-- `docs/INSTRUCTIONS_FOR_USE.md` — versioned pre-release user guide
-- `docs/OVERRIDE_AND_MODE_DESIGN.md` — recorded Block 8 override and future mode design
-- `custom_components/visual_climate_scheduler/brand/icon.png` — 256px transparent integration icon
-- `custom_components/visual_climate_scheduler/brand/icon@2x.png` — 512px high-density integration icon
-- `release_notes/RELEASE_NOTES_0.12.0-dev.md` — Block 8 release notes
+## Included
 
-## Modified
-- `MANIFEST.md`
-- `README.md`
-- `custom_components/visual_climate_scheduler/config_flow.py` — add/modify/remove room and zone setup
-- `custom_components/visual_climate_scheduler/frontend/visual-climate-scheduler-panel.js` — source/selected-day application and direct timeline editing
-- `custom_components/visual_climate_scheduler/manifest.json`
-- `custom_components/visual_climate_scheduler/rooms.py` — safe scheduled-space update helper
-- `custom_components/visual_climate_scheduler/strings.json`
-- `custom_components/visual_climate_scheduler/translations/en.json`
-- `docs/DECISIONS.md`
-- `docs/PARKED.md`
-- `docs/PROJECT_MANIFEST.md`
-- `docs/INSTRUCTIONS_FOR_USE.md`
-- `tests/test_rooms.py`
+- Standalone Home Assistant custom integration under
+  `custom_components/visual_climate_scheduler`
+- Deterministic seven-day schedule model, persistence and runtime
+- Visual desktop/tablet editor and responsive mobile controls
+- Room/zone management for standard Home Assistant climate entities
+- Temporary Quick Change holds
+- User, architecture, data-model and handoff documentation
+- Root HACS metadata and HACS/Hassfest validation workflows
+- Python unit tests for models, engine, editor, rooms and overrides
 
-## Deleted
-None.
+## Release gates
 
-## Production code
-Native slider timelines for each independent daily schedule, plus exact typed
-controls and existing room management/day application. Temporary overrides and
-learning are not included.
+- Run the automated unit suite.
+- Pass HACS validation and Hassfest on GitHub.
+- Complete live Home Assistant acceptance testing.
+- Publish a full GitHub `1.0.0` release.
+- Register the integration with Home Assistant Brands and submit the HACS
+  default-catalog request.
 
-## Recommended Git commit
-`feat: add Block 8 visual timeline slider editor`
+## Deferred to V2
 
-## Next
-- Temporary override layer
+- Behaviour learning and schedule suggestions
+- Persisted or permanent Quick Change overrides
+- Optional Away, calendar and alarm policy layers

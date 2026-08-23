@@ -2,11 +2,11 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 0.16.2-dev
-Phase: Block 12 — Open Scheduler from the Integration
-Status: The direct editor has a first-time setup view, standard climate-entity selection, copy shortcuts, continuous daily timelines and versioned panel assets
+Project version: 1.0.0
+Phase: V1 Release
+Status: V1 implementation and HACS repository packaging complete; external validation, GitHub release and HACS catalog submission remain
 
-## Session checkpoint
+## V1 release status
 
 Completed:
 - Project purpose and V1/V2 boundary defined
@@ -38,7 +38,7 @@ Completed:
 - Sidebar visibility is a persisted preference and never changes saved schedules
 - A scheduled room/zone can be modified to add or remove thermostat targets without losing its schedule
 - Sidebar day application uses an explicit source day plus selected destination-day checkboxes
-- Pre-release Instructions for Use are maintained in the GitHub Wiki and versioned in the repository
+- Instructions for Use are maintained in the GitHub Wiki and versioned in the repository
 - A local integration brand icon is bundled for current Home Assistant releases
 - Block 8 override scenarios and future Away/Calendar/Alarmo direction are documented without implementation
 - Each day card has a temperature timeline with direct time/target point dragging and a visible scale
@@ -56,8 +56,10 @@ Key decisions:
 - V2 learning is separate and initially recommendation-based
 
 Next session:
-- V1 release readiness: live HA acceptance testing, HACS packaging and a release candidate
+- Confirm HACS and Hassfest checks, complete live HA acceptance testing, publish
+  the GitHub `1.0.0` release and prepare the HACS default-catalog request
 
 ## Repository workflow
 
-During development sessions, project snapshots may be distributed as ZIP checkpoints. The user commits reviewed changes to GitHub according to this manifest.
+V1 releases are published through GitHub after unit, HACS, Hassfest and live
+Home Assistant acceptance checks pass.

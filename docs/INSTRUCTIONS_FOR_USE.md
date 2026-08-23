@@ -1,7 +1,6 @@
-# Instructions for Use — Pre-release 0.16.2-dev
+# Instructions for Use — V1.0.0
 
-This guide describes the implemented Block 12 pre-release. It is suitable for
-people happy to test an unfinished integration in a non-critical room or zone.
+This guide describes the V1 release of Visual Climate Scheduler.
 
 ## Before you begin
 
@@ -16,7 +15,7 @@ people happy to test an unfinished integration in a non-critical room or zone.
 
 1. Install this custom integration using your normal Home Assistant custom
    integration method. For a manual install, copy the
-   `custom_components/visual_climate_scheduler` folder from the checkpoint
+   `custom_components/visual_climate_scheduler` folder from the release
    into your Home Assistant `config/custom_components/` folder.
 2. Restart Home Assistant.
 3. Go to **Settings → Devices & services → Add integration**, search for
@@ -161,5 +160,5 @@ opens the same name, Area and climate-target form used on larger screens.
 ## Reporting feedback
 
 When reporting a problem, include your Home Assistant version, the integration
-version (`0.16.2-dev`), the affected room/zone and the exact steps that led to
+version (`1.0.0`), the affected room/zone and the exact steps that led to
 the result. Do not include secrets or full Home Assistant backups.
