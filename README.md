@@ -26,9 +26,11 @@ editing, up to four periods per day in this first UI.
 The bundled editor has a versioned browser asset URL, so installing an update
 also loads its matching screen instead of retaining an earlier cached editor.
 
+![Visual Climate Scheduler seven-day editor](docs/images/weekly-schedule-editor.png)
+
 When no rooms have been configured, the editor starts on **Rooms and zones**.
-If ZEAL is installed, that setup view shows only ZEAL room thermostats. Timeline
-lines now continue the final target from the previous day across midnight, and
+That setup view lists standard Home Assistant climate entities. Timeline lines
+now continue the final target from the previous day across midnight, and
 schedule copying has a **Select all** / **Clear all** shortcut.
 
 Open **Rooms and zones** in the scheduler to add, modify or remove rooms and

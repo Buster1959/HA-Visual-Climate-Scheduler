@@ -8,15 +8,15 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Enable the optional sidebar shortcut and confirm it opens the same scheduler.
 - Disable the shortcut again and confirm direct Configure launch remains
   available and schedules are unchanged.
-- Select a ZEAL Zone and verify Floor/Room are filtered.
+- Select a Zone and verify Floor/Room are filtered.
 - Select a Floor and verify Room is filtered.
-- When ZEAL is absent, fall back to the generic HA hierarchy.
+- Verify the hierarchy remains independent of the installed heating system.
 - Unused hierarchy selectors remain visible but greyed/read-only.
 - Invalid downstream selections are cleared after an upstream change.
 
 ## First-time room
 - With no scheduled spaces, Configure opens **Rooms and zones**, not an empty schedule.
-- When ZEAL is present, adding or modifying a space lists only ZEAL room thermostats.
+- Adding or modifying a space lists standard Home Assistant climate entities.
 - A new room offers sensible presets before requiring manual schedule creation.
 - User can choose a preset or copy an existing room.
 - A copied schedule can subsequently be changed independently.
@@ -56,8 +56,8 @@ These are human-facing UX tests for the visual scheduler. Passing technical test
 - Use **Select all** to choose every destination, then **Clear all** to deselect
   every destination.
 
-## ZEAL navigation prototype
-- Zone is the preferred top-level selector when ZEAL is present.
+## Hierarchical navigation prototype
+- Zone is the optional top-level selector.
 - Floor options are filtered by selected Zone.
 - Room options are filtered by selected Zone and Floor.
 - Changing Zone clears/reselects invalid downstream context.

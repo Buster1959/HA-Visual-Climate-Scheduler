@@ -16,11 +16,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Keep the schedule model importable for isolated validation and migrations.
     from .runtime import ScheduleRuntime
     from homeassistant.exceptions import ConfigEntryError
-    from .services import async_register_services
     from .storage import ScheduleStorage
     from .panel import async_sync_panel
     from .websocket_api import async_register_commands
-    from .zeal import async_discover_zeal_rooms
 
     storage = ScheduleStorage(hass, entry.entry_id)
     configuration = await storage.async_load()
@@ -41,10 +39,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "configuration": configuration,
         "storage": storage,
         "runtime": runtime,
-        # Optional Block 2 context. It is runtime-only and never stored with schedules.
-        "zeal_discovery": await async_discover_zeal_rooms(hass),
     }
-    await async_register_services(hass)
     async_register_commands(hass)
     await async_sync_panel(hass, bool(configuration.settings.get("show_panel", False)))
     return True
@@ -57,7 +52,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await entry_data["runtime"].async_stop()
     if not hass.data[DOMAIN]:
         hass.data.pop(DOMAIN)
-        hass.services.async_remove(DOMAIN, "set_zeal_room_temperature")
         from .panel import async_remove_panel
 
         await async_remove_panel(hass)

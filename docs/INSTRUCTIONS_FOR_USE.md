@@ -31,8 +31,12 @@ calendar, clock and heat icon included with this release after the restart.
 Go to **Settings → Devices & services → Visual Climate Scheduler → Configure**,
 then open **Rooms and zones**.
 
-If no rooms or zones exist yet, this is the screen that opens first. When ZEAL
-is installed, it lists only ZEAL's room thermostat entities for assignment.
+If no rooms or zones exist yet, this is the screen that opens first. It lists
+standard Home Assistant climate entities for assignment.
+
+![Add a room or zone form with name, optional Home Assistant Area and climate thermostat selection](images/add-room-or-zone.png)
+
+*The add form creates one scheduled space and assigns its climate thermostats.*
 
 - **Add a room or zone** creates a named scheduled space. Select every climate
   thermostat that should receive the same target.
@@ -42,6 +46,10 @@ is installed, it lists only ZEAL's room thermostat entities for assignment.
 - A climate thermostat can belong to only one scheduled space. This prevents
   two schedules from competing for the same device.
 - **Remove a room or zone** removes that saved space and its schedule.
+
+![Rooms and zones management showing configured spaces and the optional sidebar shortcut](images/manage-rooms-and-zones.png)
+
+*The management view keeps room/zone membership separate from daily schedule editing.*
 
 ## Temperature unit
 
@@ -79,6 +87,10 @@ The visual line at the beginning of a day continues the final target from the
 previous populated day. For example, a Monday evening target of 18°C remains at
 18°C at the beginning of Tuesday until Tuesday's first change.
 
+![Seven-day visual schedule editor with independent daily timelines and exact period fields](images/weekly-schedule-editor.png)
+
+*Each day has its own visual timeline and exact time and temperature fields.*
+
 ### Optional sidebar shortcut
 
 If you prefer a permanent navigation item, open **Rooms and zones** and tick
@@ -95,6 +107,46 @@ altering any saved weekly schedule. Select one or more rooms/zones (or
 hours, four hours or until that room's next scheduled change. Active holds can
 be cancelled individually. Temporary holds are runtime state and clear if Home
 Assistant restarts.
+
+![Quick Change view for selecting rooms, choosing a target adjustment and setting a hold duration](images/quick-change-temporary-hold.png)
+
+*Quick Change applies a temporary hold without editing the saved weekly schedule.*
+
+## Using the scheduler on mobile
+
+The same editor adapts to a narrow mobile screen. The scheduled-space selector
+moves above the navigation, and daily schedules are shown one card at a time.
+
+<img src="images/mobile-schedule-editor.png" width="360" alt="Mobile Schedule view showing the scheduled-space selector, Monday timeline and exact period fields">
+
+*Edit a daily timeline or use its exact period fields from the mobile Schedule view.*
+
+The apply, copy and save controls appear after the daily cards. Choose a Source
+day and destination days before using **Apply to selected days**. Expanding
+**Copy schedule to rooms** exposes the room destinations without changing their
+names, Areas or thermostat assignments.
+
+<img src="images/mobile-copy-and-save-schedule.jpg" width="360" alt="Mobile Apply Schedule controls with day application, room copying and Save schedule buttons">
+
+*Day application, whole-schedule copying and saving remain separate actions.*
+
+For a fast adjustment, **Quick Change** is usually the most convenient mobile
+view. Select individual rooms or choose **Whole house**, then continue to the
+change and duration controls below the room list.
+
+<img src="images/mobile-quick-change-room-selection.png" width="360" alt="Mobile Quick Change view showing room selection and the Whole house shortcut">
+
+*Select the scope of a temporary hold before choosing its temperature and duration.*
+
+Room and zone management is also available on mobile. Existing spaces are
+shown as cards with **Modify** and **Remove** actions, while **Add room or zone**
+opens the same name, Area and climate-target form used on larger screens.
+
+<img src="images/mobile-manage-rooms-and-zones.png" width="360" alt="Mobile Rooms and zones view showing configured spaces with Modify and Remove actions">
+
+<img src="images/mobile-add-room-or-zone.png" width="360" alt="Privacy-safe mobile Add a room or zone form showing an example climate thermostat">
+
+*The mobile setup form uses a privacy-safe example thermostat; select the real Home Assistant climate entities in your installation.*
 
 ## Current limits and safe testing
 

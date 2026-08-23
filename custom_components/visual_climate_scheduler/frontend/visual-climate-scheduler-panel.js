@@ -18,7 +18,6 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     this._quickExactTarget = "";
     this._spaceDraft = null;
     this._areas = [];
-    this._setupContext = { zeal_installed: false, zeal_thermostats: [] };
     this._message = "";
     this.shadowRoot.addEventListener("click", (event) => this._onClick(event));
     this.shadowRoot.addEventListener("change", (event) => this._onChange(event));
@@ -49,7 +48,7 @@ class VisualClimateSchedulerPanel extends HTMLElement {
       }
       if (!this._roomId) this._view = "manage";
       this._loadRoom();
-      await Promise.all([this._loadAreas(), this._loadSetupContext()]);
+      await this._loadAreas();
       await this._loadQuick(false);
       this._render();
     } catch (error) {
@@ -77,11 +76,6 @@ class VisualClimateSchedulerPanel extends HTMLElement {
   async _loadAreas() {
     try { this._areas = await this._hass.callWS({ type: "config/area_registry/list" }); }
     catch (_) { this._areas = []; }
-  }
-
-  async _loadSetupContext() {
-    try { this._setupContext = await this._hass.callWS({ type: "visual_climate_scheduler/get_setup_context" }); }
-    catch (_) { this._setupContext = { zeal_installed: false, zeal_thermostats: [] }; }
   }
 
   async _onChange(event) {
@@ -521,11 +515,6 @@ class VisualClimateSchedulerPanel extends HTMLElement {
   }
 
   _climateTargets() {
-    if (this._setupContext?.zeal_installed) {
-      return (this._setupContext.zeal_thermostats || [])
-        .map((thermostat) => [thermostat.entity_id, { attributes: { friendly_name: thermostat.name }, zone_name: thermostat.zone_name }])
-        .sort(([left], [right]) => left.localeCompare(right));
-    }
     return Object.entries(this._hass?.states || {})
       .filter(([entityId]) => entityId.startsWith("climate."))
       .sort(([left], [right]) => left.localeCompare(right));
@@ -537,9 +526,8 @@ class VisualClimateSchedulerPanel extends HTMLElement {
     const roomCards = Object.entries(rooms).map(([roomId, room]) => `<article class="space-card"><div><h2>${this._escape(room.name)}</h2><p>${room.climate_entity_ids.length} thermostat${room.climate_entity_ids.length === 1 ? "" : "s"}${room.area_id ? ` · Area: ${this._escape(room.area_id)}` : ""}</p></div><div><button class="secondary small" data-action="manage-edit" data-room-id="${this._escape(roomId)}">Modify</button><button class="danger small" data-action="manage-remove" data-room-id="${this._escape(roomId)}">Remove</button></div></article>`).join("");
     const draft = this._spaceDraft;
     const areaOptions = (this._areas || []).sort((left, right) => left.name.localeCompare(right.name)).map((area) => `<option value="${this._escape(area.area_id)}" ${draft?.area_id === area.area_id ? "selected" : ""}>${this._escape(area.name)}</option>`).join("");
-    const targets = this._climateTargets().map(([entityId, state]) => `<label class="target-option"><input type="checkbox" data-action="space-target" value="${this._escape(entityId)}" ${draft?.climate_entity_ids.includes(entityId) ? "checked" : ""}><span>${this._escape(state.attributes.friendly_name || entityId)}<small>${this._escape(entityId)}${state.zone_name ? ` · ${this._escape(state.zone_name)}` : ""}</small></span></label>`).join("");
-    const zealNote = this._setupContext?.zeal_installed ? " ZEAL is installed, so only its room thermostats are listed." : "";
-    const editor = draft ? `<section class="space-editor"><h2>${draft.id ? "Modify room or zone" : "Add a room or zone"}</h2><label>Name<input data-action="space-name" value="${this._escape(draft.name)}" placeholder="e.g. Lounge"></label><label>Home Assistant Area (optional)<select data-action="space-area"><option value="">No Area</option>${areaOptions}</select></label><p class="subtitle">Select every climate thermostat that should receive this schedule (${unit}). A thermostat can only belong to one scheduled space.${zealNote}</p><div class="target-options">${targets || "No eligible climate thermostats are currently available."}</div><div class="space-actions"><button data-action="manage-save">Save room or zone</button><button class="secondary" data-action="manage-cancel">Cancel</button></div></section>` : "";
+    const targets = this._climateTargets().map(([entityId, state]) => `<label class="target-option"><input type="checkbox" data-action="space-target" value="${this._escape(entityId)}" ${draft?.climate_entity_ids.includes(entityId) ? "checked" : ""}><span>${this._escape(state.attributes.friendly_name || entityId)}<small>${this._escape(entityId)}</small></span></label>`).join("");
+    const editor = draft ? `<section class="space-editor"><h2>${draft.id ? "Modify room or zone" : "Add a room or zone"}</h2><label>Name<input data-action="space-name" value="${this._escape(draft.name)}" placeholder="e.g. Lounge"></label><label>Home Assistant Area (optional)<select data-action="space-area"><option value="">No Area</option>${areaOptions}</select></label><p class="subtitle">Select every Home Assistant climate thermostat that should receive this schedule (${unit}). A thermostat can only belong to one scheduled space.</p><div class="target-options">${targets || "No eligible climate thermostats are currently available."}</div><div class="space-actions"><button data-action="manage-save">Save room or zone</button><button class="secondary" data-action="manage-cancel">Cancel</button></div></section>` : "";
     const sidebarEnabled = Boolean(this._configuration?.settings?.show_panel);
     return `<section class="manage-page"><div class="manage-header"><div><h2>Rooms and zones</h2><p class="subtitle">One schedule can set one or many thermostats in the same room or zone.</p></div><button data-action="manage-new">+ Add room or zone</button></div>${editor}<div class="spaces">${roomCards || '<p class="empty">No rooms or zones configured yet.</p>'}</div><section class="sidebar-setting"><label><input type="checkbox" data-action="sidebar-shortcut" ${sidebarEnabled ? "checked" : ""}> Show Climate Scheduler in the sidebar</label><p class="subtitle">This is only a shortcut. The scheduler is always available from this integration.</p></section></section>`;
   }

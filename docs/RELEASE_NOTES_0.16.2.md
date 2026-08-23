@@ -4,8 +4,7 @@
 
 - An empty integration opens on **Rooms and zones**, so first-time users are not
   sent to an empty schedule.
-- With ZEAL installed, room/zone setup offers only ZEAL's canonical room
-  thermostat entities.
+- Room/zone setup offers standard Home Assistant climate entities.
 - Schedule copy now provides **Select all** and **Clear all** for destination
   rooms/zones.
 - Timeline lines visibly continue the previous populated day's final target

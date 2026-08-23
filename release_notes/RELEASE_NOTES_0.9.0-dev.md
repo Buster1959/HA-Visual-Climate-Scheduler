@@ -23,4 +23,4 @@
 
 - The visual schedule editor and period-editing UI.
 - Temporary/permanent overrides and learning.
-- Any change to the existing ZEAL test action.
+- Any heating-system-specific test action.

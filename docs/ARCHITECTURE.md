@@ -9,7 +9,7 @@ Visual Climate Scheduler
       +--> Persistent configuration (HA Store / JSON-serialisable)
       +--> Schedule engine
       +--> Runtime state / overrides
-      +--> Optional ZEAL discovery context
+      +--> Standard HA climate entity discovery
       +--> Native HA schedule editor (direct integration launch; optional sidebar shortcut)
       +--> Mobile quick-control
       |
@@ -40,11 +40,11 @@ The same editor contains the small room/zone management view. This avoids a
 second management route being hidden by the direct Configure launch, while
 reusing the existing validated room operations and persistence boundary.
 
-## Optional ZEAL discovery
-When ZEAL is installed, the integration can discover ZEAL's canonical room
-thermostat entities through Home Assistant's public boundaries. Discovery is
-runtime-only and provides preferred Zone navigation context. It does not add a
-schedule type, alter stored rooms or execute schedules.
+## Climate entity discovery
+The editor lists standard Home Assistant `climate` entities from the state
+machine. Saved rooms and zones reference those entity IDs directly; the runtime
+controls them only through Home Assistant's `climate.set_temperature` service.
+There is no heating-system-specific discovery or integration boundary.
 
 ## Data principles
 - Human-readable

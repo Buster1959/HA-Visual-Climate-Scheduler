@@ -2,9 +2,6 @@
 
 DOMAIN = "visual_climate_scheduler"
 INTEGRATION_TITLE = "Visual Climate Scheduler"
-ZEAL_DOMAIN = "zeal"
-
-SERVICE_SET_ZEAL_ROOM_TEMPERATURE = "set_zeal_room_temperature"
 ATTR_ZONE_ID = "zone_id"
 ATTR_ROOM_ID = "room_id"
 ATTR_TEMPERATURE = "temperature"
@@ -21,7 +18,7 @@ PANEL_URL_PATH = DOMAIN
 PANEL_STATIC_URL = f"/{DOMAIN}_static"
 # Changes whenever the bundled panel JavaScript changes, so a browser never
 # reuses an older editor after an integration update.
-PANEL_ASSET_VERSION = "0.16.2"
+PANEL_ASSET_VERSION = "0.16.3"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = DOMAIN

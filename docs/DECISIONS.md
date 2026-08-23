@@ -27,10 +27,10 @@
 - **D-025** — Identical daily schedules may be displayed as dynamic Weekdays/Weekend groups; divergence displays individual days.
 - **D-026** — Grouped edits apply only to the selected schedule period and do not overwrite other periods.
 
-- **D-028** — When ZEAL is installed and configured, its Zones are the preferred top-level navigation context; ZEAL remains optional.
+- **D-028** — Zone remains an optional top-level navigation context independent of the underlying heating system.
 - **D-029** — The approved `ui_mockup/index.html` is the baseline for visual UX work and should be evolved rather than replaced without a decision.
 - **D-030** — UI development is validated against human-facing acceptance tests before production integration implementation.
-- **D-031** — In the UI, ZEAL Zone is the preferred top-level navigation when ZEAL is installed; Floor and Room selectors cascade from the selected Zone.
+- **D-031** — In hierarchical UI variants, Floor and Room selectors cascade from the selected Zone.
 - **D-032** — The visual mockup must be a functional local UX prototype: schedule edits, time/setpoint changes, weekday breaking and weekday application must visibly update local state before production HA integration work begins.
 - **D-033** — The schedule timeline shall display a temperature scale on the left and support both precise numeric editing and direct vertical point manipulation.
 - **D-034** — The first V1 production boundary is a standard Home Assistant config-entry integration. Its persisted schedule model is Home Assistant-runtime-independent, versioned and JSON-serialisable; Home Assistant Store is accessed only through a dedicated adapter.
@@ -54,4 +54,4 @@
 - **D-052** — Copying a schedule to another room/zone replaces only its seven daily period lists. The destination's name, Area and thermostat assignments are never copied.
 - **D-053** — The Home Assistant temperature unit at initial setup is a fixed schedule reference. A later `°C`/`°F` change blocks setup until the integration is removed and re-added; values are never silently converted or reinterpreted.
 - **D-054** — The full scheduler is the integration's admin-only configuration panel and is always available through its Configure action. The persisted sidebar preference controls only an optional navigation shortcut, never access to the editor or any schedule data. Room/zone management remains available within that editor so the direct launch cannot hide it.
-- **D-055** — Friendly setup follows the available context: an empty scheduler opens on room/zone setup, and when ZEAL is present its canonical room thermostats are the only setup candidates. The visual timeline represents the same cross-midnight carry-over used by the engine; copying may select or clear all eligible destination spaces without creating a new schedule scope.
+- **D-055** — Friendly setup follows the available context: an empty scheduler opens on room/zone setup and offers standard Home Assistant climate entities. The visual timeline represents the same cross-midnight carry-over used by the engine; copying may select or clear all eligible destination spaces without creating a new schedule scope.

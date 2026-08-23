@@ -4,7 +4,7 @@ Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
 Project version: 0.16.2-dev
 Phase: Block 12 — Open Scheduler from the Integration
-Status: The direct editor has a first-time setup view, ZEAL-aware thermostat selection, copy shortcuts, continuous daily timelines and versioned panel assets
+Status: The direct editor has a first-time setup view, standard climate-entity selection, copy shortcuts, continuous daily timelines and versioned panel assets
 
 ## Session checkpoint
 
@@ -25,8 +25,8 @@ Completed:
 - Versioned JSON schedule-model and HA Store boundary added
 - Strict exact-minute validation, daily conflict validation and safe schema migration added
 - Explicit schedule-copy semantics added: days are detached; stable period IDs are retained
-- ZEAL discovery decisions retained as optional navigation context only
-- Block 2 ZEAL discovery, diagnostics and explicit thermostat-only test action retained
+- Generic room, zone and floor navigation decisions retained
+- Standard Home Assistant climate entities are the only control boundary
 - Standing principle "Simple underneath, friendly on top" recorded
 - Deterministic active-period calculation added, including overnight and empty-day carry-over
 - Home Assistant runtime adapter applies startup targets and schedules the nearest transition
@@ -47,7 +47,7 @@ Completed:
 - Schedule storage records `°C` or `°F` at initial setup and rejects a changed HA unit rather than silently applying misleading targets
 - The scheduler is registered as the integration configuration panel and remains directly available when the optional sidebar shortcut is hidden
 - Bundled panel assets use a versioned URL so an integration update does not reuse a stale browser-cached editor
-- Empty installations open directly to room/zone setup; ZEAL installations list only ZEAL thermostats during setup
+- Empty installations open directly to room/zone setup and list standard Home Assistant climate entities
 - Copying schedules offers Select all / Clear all and timelines visibly carry the prior day's final target across midnight
 
 Key decisions:

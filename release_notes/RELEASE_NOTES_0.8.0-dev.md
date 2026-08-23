@@ -17,8 +17,7 @@
   `climate.set_temperature`; it never controls HVAC internals or underlying TRVs.
 - Configuration remains in Home Assistant Store. Timer state, active periods and
   future overrides remain runtime-only.
-- The existing `visual_climate_scheduler.set_zeal_room_temperature` action is
-  unchanged.
+- No heating-system-specific service is required by the schedule engine.
 
 ## Not included
 

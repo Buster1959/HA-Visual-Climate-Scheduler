@@ -15,10 +15,8 @@
 
 ## Preserved from Block 2
 
-- ZEAL remains optional. When installed/configured, it is the preferred
-  navigation context only; its discovery, diagnostics and explicit
-  thermostat-only test action are retained. It does not alter the persisted
-  schedule model.
+- Hierarchical room and zone navigation remains optional and does not alter the
+  persisted schedule model.
 
 ## Not included
 

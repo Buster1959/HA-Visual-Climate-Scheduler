@@ -20,7 +20,7 @@ body{margin:0;font:15px system-ui;background:#f4f7fb;color:#172033}header{backgr
 <main>
 <div class="card selectors">
 <div><label>Zone</label><select id="zoneSelect" onchange="navChanged()"><option value="downstairs">Downstairs</option><option value="upstairs">Upstairs</option></select></div>
-<div><label>Floor <span style="font-weight:400;color:#8a93a2">(ZEAL-aware)</span></label><select id="floorSelect" onchange="navChanged()"></select></div>
+<div><label>Floor <span style="font-weight:400;color:#8a93a2">(optional hierarchy)</span></label><select id="floorSelect" onchange="navChanged()"></select></div>
 <div><label>Room</label><select id="roomSelect" onchange="roomChanged()"></select></div>
 </div>
 <div class="card preset">
@@ -157,7 +157,7 @@ function copyRoom(){
 
 
 <script>
-const zealHierarchy = {
+const spaceHierarchy = {
   downstairs: {
     "Ground Floor": ["Living Room","Kitchen","Dining Room"],
     "First Floor": ["Office"]
@@ -171,7 +171,7 @@ function navChanged(){
   const zone=document.getElementById("zoneSelect").value;
   const floor=document.getElementById("floorSelect");
   const room=document.getElementById("roomSelect");
-  const floors=Object.keys(zealHierarchy[zone]);
+  const floors=Object.keys(spaceHierarchy[zone]);
   const oldFloor=floor.value;
   floor.innerHTML="";
   floors.forEach(f=>floor.add(new Option(f,f)));
@@ -184,7 +184,7 @@ function updateRooms(){
   const room=document.getElementById("roomSelect");
   const old=room.value;
   room.innerHTML="";
-  (zealHierarchy[zone][floor]||[]).forEach(r=>room.add(new Option(r,r)));
+  (spaceHierarchy[zone][floor]||[]).forEach(r=>room.add(new Option(r,r)));
   if ([...room.options].some(o=>o.value===old)) room.value=old;
   roomChanged();
 }
@@ -195,7 +195,7 @@ function roomChanged(){
   const subtitle=document.querySelector(".room p");
   const zone=document.getElementById("zoneSelect").value;
   const floor=document.getElementById("floorSelect").value;
-  if(subtitle) subtitle.textContent=floor+" • "+(zone==="downstairs"?"Downstairs":"Upstairs")+" • ZEAL Zone";
+  if(subtitle) subtitle.textContent=floor+" • "+(zone==="downstairs"?"Downstairs":"Upstairs")+" • Zone";
 }
 navChanged();
 </script>
@@ -326,7 +326,7 @@ navChanged();
     alert("Monday is now independent. Tuesday–Friday remain unchanged.");
   });
 
-  // Ensure the room selector remains compatible with the ZEAL prototype.
+  // Keep the room selector synchronized with the hierarchy prototype.
   const roomSelect=root.getElementById("roomSelect");
   if(roomSelect) roomSelect.addEventListener("change",()=>{
     const title=root.querySelector(".room h2"); if(title) title.textContent=roomSelect.value;
