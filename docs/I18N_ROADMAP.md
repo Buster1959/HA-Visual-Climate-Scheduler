@@ -4,11 +4,13 @@
 config/options flow and the custom frontend panel — with English as the source
 of truth and a low-friction path for adding new languages.
 
-**Status at time of writing (v1.0.0):**
+**Current status:**
 
-- Config/options flow: already internationalised. `strings.json` +
-  `translations/en.json` exist and are complete (~30 keys). HA loads the right
-  file automatically from the user's profile language.
+- Config/options flow: internationalised in English, Danish, Dutch, Finnish,
+  French, German, Italian, Norwegian Bokmål, Spanish and Swedish. HA loads the
+  appropriate `translations/<language>.json` catalogue from the user's profile
+  language. An automated test keeps every catalogue structurally aligned with
+  English.
 - Frontend panel (`frontend/visual-climate-scheduler-panel.js`, 591 lines):
   **not** internationalised. ~40+ user-facing strings are hardcoded English
   literals. No localisation hook exists yet.

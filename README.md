@@ -11,6 +11,11 @@ launch, the optional sidebar shortcut, mobile use and current limitations.
 The integration includes its own Home Assistant brand icon for current Home
 Assistant releases.
 
+Home Assistant setup and options screens include English, Danish, Dutch,
+Finnish, French, German, Italian, Norwegian Bokmål, Spanish and Swedish. The
+custom schedule editor itself remains English while its separate frontend
+localisation framework is developed.
+
 ## What V1 provides
 
 Open the full, admin-only scheduler from **Settings → Devices & services →
