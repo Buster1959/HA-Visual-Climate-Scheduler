@@ -2,9 +2,9 @@
 
 Project: HA Visual Climate Scheduler
 Repository: Buster1959/HA-Visual-Climate-Scheduler
-Project version: 1.0.0
+Project version: 1.0.1
 Phase: V1 Release
-Status: V1 implementation and HACS repository packaging complete; external validation, GitHub release and HACS catalog submission remain
+Status: V1.0.1 prepared and HACS catalog submission open for review
 
 ## V1 release status
 
