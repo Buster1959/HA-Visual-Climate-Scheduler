@@ -84,3 +84,9 @@ saved values in the wrong unit.
 Optional learning of repeated user behaviour, including temperature/time changes, with suggestions before automatic changes are considered.
 
 See `docs/RELEASE_NOTES_1.0.0.md` for the V1 release summary.
+
+## Support the project
+
+If Visual Climate Scheduler is useful to you and you would like to support its
+continued development, you can [buy me a coffee](https://buymeacoffee.com/brentjbrown).
+Your support is appreciated, but never required.
