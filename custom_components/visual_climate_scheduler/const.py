@@ -25,3 +25,8 @@ STORAGE_KEY = DOMAIN
 
 AUDIT_STORAGE_VERSION = 1
 AUDIT_MAX_ENTRIES = 5000
+
+# Sleeping battery thermostats may accept a service call while deferring the
+# radio command. Retry only after a new device report and never more frequently
+# than this, so reconciliation cannot become a battery-draining write loop.
+SETPOINT_CONFIRMATION_RETRY_MIN_SECONDS = 5 * 60
