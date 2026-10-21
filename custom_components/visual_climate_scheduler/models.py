@@ -257,6 +257,16 @@ class ScheduleConfiguration:
             temperature_unit=validate_temperature_unit(temperature_unit),
         )
 
+    def with_settings(
+        self, settings: Mapping[str, Any]
+    ) -> "ScheduleConfiguration":
+        """Return a copy with updated settings and all schedule metadata retained."""
+        return ScheduleConfiguration(
+            rooms=self.rooms,
+            settings=settings,
+            temperature_unit=self.temperature_unit,
+        )
+
     @staticmethod
     def migrate_dict(value: Mapping[str, Any]) -> dict[str, Any]:
         """Migrate a stored document to the current schema.

@@ -229,9 +229,7 @@ class VisualClimateSchedulerOptionsFlow(config_entries.OptionsFlow):
         configuration = entry_data["configuration"]
         if user_input is not None:
             settings = {**configuration.settings, CONF_SHOW_PANEL: user_input[CONF_SHOW_PANEL]}
-            updated_configuration = type(configuration)(
-                rooms=configuration.rooms, settings=settings
-            )
+            updated_configuration = configuration.with_settings(settings)
             await async_save_configuration(
                 self.hass, self.config_entry.entry_id, updated_configuration
             )

@@ -65,6 +65,20 @@ class ScheduleModelTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "°C or °F"):
             ScheduleConfiguration(temperature_unit="kelvin")
 
+    def test_settings_update_preserves_temperature_unit_and_schedules(self) -> None:
+        configured_room = room()
+        original = ScheduleConfiguration(
+            rooms={configured_room.id: configured_room},
+            settings={"show_panel": False},
+            temperature_unit="°F",
+        )
+
+        updated = original.with_settings({"show_panel": True})
+
+        self.assertEqual(updated.temperature_unit, "°F")
+        self.assertEqual(updated.rooms, original.rooms)
+        self.assertEqual(updated.settings, {"show_panel": True})
+
     def test_seven_days_are_required_and_independent(self) -> None:
         with self.assertRaisesRegex(ValueError, "exactly monday through sunday"):
             room({"monday": ()})

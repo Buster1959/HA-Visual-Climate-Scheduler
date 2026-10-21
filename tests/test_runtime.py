@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
+from custom_components.visual_climate_scheduler.models import (
+    RoomSchedule,
+    ScheduleConfiguration,
+    SchedulePeriod,
+    WEEKDAYS,
+)
 from custom_components.visual_climate_scheduler.runtime import ScheduleRuntime
 
 
@@ -50,6 +57,28 @@ class FakeHass:
     def __init__(self, states: dict[str, FakeState]) -> None:
         self.states = FakeStates(states)
         self.services = FakeServices()
+        self.tasks: list[asyncio.Task] = []
+
+    def async_create_task(self, coroutine):
+        task = asyncio.create_task(coroutine)
+        self.tasks.append(task)
+        return task
+
+
+def scheduled_room(
+    room_id: str, name: str, entity_ids: tuple[str, ...]
+) -> RoomSchedule:
+    days = {day: () for day in WEEKDAYS}
+    days["saturday"] = (
+        SchedulePeriod("morning", "morning", "Morning", "06:00", 21.0),
+    )
+    return RoomSchedule(
+        id=room_id,
+        name=name,
+        area_id=None,
+        climate_entity_ids=entity_ids,
+        days=days,
+    )
 
 
 class FakeAudit:
@@ -161,6 +190,98 @@ class RuntimeConfirmationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([], self.hass.services.calls)
         self.assertNotIn(self.entity_id, self.runtime._pending_targets)
         self.assertEqual("already_at_target", self.audit.entries[-1]["outcome"])
+
+    async def test_rejected_target_does_not_block_other_rooms_or_timer(self):
+        first = "climate.first_room_bad_thermostat"
+        second = "climate.first_room_good_thermostat"
+        third = "climate.second_room_thermostat"
+        hass = FakeHass(
+            {
+                first: FakeState(18.0),
+                second: FakeState(18.0),
+                third: FakeState(18.0),
+            }
+        )
+        audit = FakeAudit()
+        runtime = ScheduleRuntime(hass, audit)
+        runtime._configuration = ScheduleConfiguration(
+            rooms={
+                "first_room": scheduled_room(
+                    "first_room", "First Room", (first, second)
+                ),
+                "second_room": scheduled_room(
+                    "second_room", "Second Room", (third,)
+                ),
+            }
+        )
+
+        def reject_first_target(data):
+            if data["entity_id"] == first:
+                raise ValueError("target outside thermostat range")
+
+        hass.services.on_call = reject_first_target
+        with (
+            patch(
+                "custom_components.visual_climate_scheduler.runtime.dt_util.utcnow",
+                return_value=NOW,
+            ),
+            patch(
+                "custom_components.visual_climate_scheduler.runtime.dt_util.now",
+                return_value=NOW,
+            ),
+            patch.object(runtime, "_schedule_next_transition") as schedule_next,
+        ):
+            await runtime._async_handle_transition(NOW)
+
+        self.assertEqual(
+            [first, second, third],
+            [call["entity_id"] for call in hass.services.calls],
+        )
+        self.assertIn(first, runtime._pending_targets)
+        self.assertEqual("failed_pending_retry", audit.entries[0]["outcome"])
+        self.assertEqual("pending_confirmation", audit.entries[-1]["outcome"])
+        schedule_next.assert_called_once_with(NOW)
+
+    async def test_missing_target_is_retried_when_it_first_reports(self):
+        entity_id = "climate.late_loading_thermostat"
+        hass = FakeHass({})
+        audit = FakeAudit()
+        runtime = ScheduleRuntime(hass, audit)
+        configuration = ScheduleConfiguration(
+            rooms={
+                "late_room": scheduled_room(
+                    "late_room", "Late Room", (entity_id,)
+                )
+            }
+        )
+
+        with (
+            patch(
+                "custom_components.visual_climate_scheduler.runtime.event_helper.async_track_state_change_event",
+                return_value=lambda: None,
+            ),
+            patch(
+                "custom_components.visual_climate_scheduler.runtime.event_helper.async_track_state_report_event",
+                return_value=lambda: None,
+            ),
+            patch.object(runtime, "_schedule_next_transition"),
+            patch(
+                "custom_components.visual_climate_scheduler.runtime.dt_util.now",
+                return_value=NOW,
+            ),
+        ):
+            await runtime.async_start(configuration)
+            self.assertIn(entity_id, runtime._pending_targets)
+            hass.states.values[entity_id] = FakeState(18.0)
+            runtime._handle_target_event(
+                SimpleNamespace(data={"entity_id": entity_id})
+            )
+            await asyncio.gather(*hass.tasks)
+
+        self.assertEqual(
+            [entity_id], [call["entity_id"] for call in hass.services.calls]
+        )
+        self.assertEqual("pending_confirmation", audit.entries[-1]["outcome"])
 
 
 if __name__ == "__main__":

@@ -29,8 +29,11 @@ Use Home Assistant's Store helper for versioned JSON-serialisable persistent con
 The thermostat application audit uses a second versioned Store document. The
 runtime appends one result for each attempted `climate.set_temperature` call,
 including unavailable and failed targets, and retains the latest 5,000
-entries. The admin-only WebSocket API exposes a detached export document for
-download; audit records never become part of the schedule configuration.
+entries. A rejected service call is contained to that target: later targets and
+rooms still run, and the transition timer is still arranged. Failed and
+unavailable targets remain pending for event-driven retry. The admin-only
+WebSocket API exposes a detached export document for download; audit records
+never become part of the schedule configuration.
 
 ## Scheduler editor
 The native Home Assistant scheduler editor is admin-only and registered as the
@@ -67,7 +70,11 @@ There is no heating-system-specific discovery or integration boundary.
 
 The V1 engine is deterministic. At integration startup it resolves each room's
 or zone's latest period and applies its target to every configured climate
-entity in that scheduled space.
+entity in that scheduled space. It subscribes to state-change and state-report
+events for those targets before applying schedules, so an entity that is
+missing or unavailable during setup is retried when it appears or reports
+again. A single target failure does not prevent other targets or rooms from
+being reconciled.
 It then schedules only the nearest future transition. If a day is empty, the
 most recent period from an earlier populated day remains active; no setpoint is
 invented. Active-period tracking and timer handles are runtime-only.

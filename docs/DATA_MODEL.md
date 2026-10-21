@@ -54,7 +54,8 @@ Each config entry owns one JSON document through Home Assistant's Store helper:
 - Overrides, active periods, device availability and learning history are runtime state, not part of this document.
 - `settings.show_panel` is the optional sidebar-editor visibility preference. It
   changes only Home Assistant navigation and is deliberately separate from
-  schedules and runtime execution state.
+  schedules and runtime execution state. Updating it preserves the stored
+  `temperature_unit` and all room schedules.
 
 ## Versioning and migration
 
